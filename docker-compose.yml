@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  api-service:
+    build:
+      dockerfile: Dockerfile
+      context: ./api
+      target: prod
+    container_name: api-service
+    hostname: api-service
+    restart: on-failure
+    ports:
+      - "7780:3000"
+    networks:
+      algeo-network:
+        aliases:
+          - api.local
+
+networks:
+  algeo-network:
