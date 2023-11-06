@@ -25,13 +25,13 @@ func InitCombinations() {
 	vRanges := [][2]float64{
 		{0, 0.2},
 		{0.2, 0.7},
-		{0.7, 1},Combination
+		{0.7, 1},
 	}
 
 	for _, hRange := range hRanges {
 		for _, sRange := range sRanges {
 			for _, vRange := range vRanges {
-				combination := Combination{
+				combination := schema.Combination{
 					HRange: hRange,
 					SRange: sRange,
 					VRange: vRange,
