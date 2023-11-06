@@ -2,7 +2,6 @@ package main
 
 import (
 	"algeo02/api"
-	"algeo02/initializations"
 	"os"
 
 	"github.com/gin-contrib/gzip"
@@ -15,7 +14,6 @@ func main() {
 	router.Use(gzip.Gzip(gzip.DefaultCompression))
 
 	// init
-	initializations.InitCombinations()
 	// db.Connect()
 	api.SetupApiRoute(router)
 	var port string = os.Getenv("PORT")

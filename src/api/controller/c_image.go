@@ -165,5 +165,5 @@ func CheckV1(context *gin.Context) {
 		}(file, i)
 	}
 	wg.Wait()
-	context.JSON(http.StatusOK, gin.H{"success": true, "data": vector[0]})
+	context.JSON(http.StatusOK, gin.H{"success": true, "dataas": vector[0]})
 }

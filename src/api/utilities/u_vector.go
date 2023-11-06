@@ -1,39 +1,31 @@
 package utilities
 
 import (
-	"algeo02/initializations"
 	"algeo02/schema"
 	_ "image/jpeg"
 	_ "image/png"
-	"sync"
 )
 
-func isWithinCombination(hsv schema.HSV, combination schema.Combination) bool {
-	return hsv.H >= float64(combination.HRange[0]) && hsv.H <= float64(combination.HRange[1]) &&
-		hsv.S >= combination.SRange[0] && hsv.S <= combination.SRange[1] &&
-		hsv.V >= combination.VRange[0] && hsv.V <= combination.VRange[1]
-}
+func GetVector(data []schema.HSV) []int {
+	hRanges := [][]float64{{316.0, 360.0}, {1.0, 25}, {26.0, 40.0}, {41.0, 120.0}, {121.0, 190.0}, {191.0, 270.0}, {271.0, 295}, {295, 315}}
+	sRanges := [][]float64{{0, 0.2}, {0.2, 0.7}, {0.7, 1.01}}
+	vRanges := [][]float64{{0, 0.2}, {0.2, 0.7}, {0.7, 1.01}}
 
-func GetVector(dataHSV []schema.HSV) []int {
-	histogram := make([]int, len(initializations.Combinations))
-	var wg sync.WaitGroup
-	var mu sync.Mutex
+	histogram := make([]int, 72)
 
-	for _, hsvValue := range dataHSV {
-		wg.Add(1)
-		go func(hsvValue schema.HSV) {
-			defer wg.Done()
-			for i, combination := range initializations.Combinations {
-				if isWithinCombination(hsvValue, combination) {
-					mu.Lock()
-					histogram[i]++
-					mu.Unlock()
-					break
+	for i, h := range hRanges {
+		for j, s := range sRanges {
+			for k, v := range vRanges {
+				for _, hsv := range data {
+					if h[0] <= hsv.H && hsv.H <= h[1] &&
+						s[0] <= hsv.S && hsv.S < s[1] &&
+						v[0] <= hsv.V && hsv.V < v[1] {
+						histogram[i*9+j*3+k]++
+					}
 				}
 			}
-		}(hsvValue)
+		}
 	}
 
-	wg.Wait()
 	return histogram
 }
