@@ -1,12 +1,8 @@
 package initializations
 
-type Combination struct {
-	HRange [2]float64
-	SRange [2]float64
-	VRange [2]float64
-}
+import "algeo02/schema"
 
-var Combinations []Combination
+var Combinations []schema.Combination
 
 func InitCombinations() {
 	hRanges := [][2]float64{
@@ -29,7 +25,7 @@ func InitCombinations() {
 	vRanges := [][2]float64{
 		{0, 0.2},
 		{0.2, 0.7},
-		{0.7, 1},
+		{0.7, 1},Combination
 	}
 
 	for _, hRange := range hRanges {

@@ -15,7 +15,7 @@ func main() {
 	router.Use(gzip.Gzip(gzip.DefaultCompression))
 
 	// init
-	initializations.InitCombinations()()
+	initializations.InitCombinations()
 	// db.Connect()
 	api.SetupApiRoute(router)
 	var port string = os.Getenv("PORT")
