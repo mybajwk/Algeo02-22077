@@ -24,5 +24,7 @@ func setupPublicRoute(router *gin.Engine) {
 	publicRoutes := router.Group("/image/")
 
 	publicRoutes.POST("/", controller.Check)
+	publicRoutes.POST("/dum", controller.CheckV1)
+	// publicRoutes.POST("/upload-data", controller.UploadDataSet)
 
 }
