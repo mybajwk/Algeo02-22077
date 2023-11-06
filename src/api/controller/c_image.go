@@ -53,16 +53,21 @@ func Check(context *gin.Context) {
 
 	bounds := img.Bounds()
 	width, height := bounds.Max.X, bounds.Max.Y
-	rgbMatrix := make([][]schema.HSV, height)
+	rgbMatrix := make([]schema.HSV, height)
+
+	idx := 0
 
 	for y := 0; y < height; y++ {
-		rgbMatrix[y] = make([]schema.HSV, width)
 		for x := 0; x < width; x++ {
 			r, g, b, _ := img.At(x, y).RGBA()
-			rgbMatrix[y][x] = utilities.ConvertRGBToHSV(r, g, b)
+			rgbMatrix[idx] = utilities.ConvertRGBToHSV(r, g, b)
+
 		}
+
+		idx++
 	}
-	context.JSON(http.StatusOK, gin.H{"success": true, "data": ""})
+	vector := utilities.GetVector(rgbMatrix)
+	context.JSON(http.StatusOK, gin.H{"success": true, "data": vector})
 }
 func CheckV1(context *gin.Context) {
 
@@ -95,7 +100,6 @@ func CheckV1(context *gin.Context) {
 
 	// Iterate over the files in the directory
 	for _, file := range files {
-		log.Info().Msg("Ejala")
 
 		if file.IsDir() {
 			// Skip directories
@@ -136,15 +140,21 @@ func CheckV1(context *gin.Context) {
 
 		bounds := img.Bounds()
 		width, height := bounds.Max.X, bounds.Max.Y
-		rgbMatrix := make([][]schema.HSV, height)
+		rgbMatrix := make([]schema.HSV, height)
+
+		idx := 0
 
 		for y := 0; y < height; y++ {
-			rgbMatrix[y] = make([]schema.HSV, width)
 			for x := 0; x < width; x++ {
 				r, g, b, _ := img.At(x, y).RGBA()
-				rgbMatrix[y][x] = utilities.ConvertRGBToHSV(r, g, b)
+				rgbMatrix[idx] = utilities.ConvertRGBToHSV(r, g, b)
+
 			}
+
+			idx++
 		}
+		_ = utilities.GetVector(rgbMatrix)
+
 	}
 	context.JSON(http.StatusOK, gin.H{"success": true, "data": ""})
 }

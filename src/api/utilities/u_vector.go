@@ -13,7 +13,7 @@ func isWithinCombination(hsv schema.HSV, combination schema.Combination) bool {
 		hsv.V >= combination.VRange[0] && hsv.V <= combination.VRange[1]
 }
 
-func getVector(dataHSV []schema.HSV) []int {
+func GetVector(dataHSV []schema.HSV) []int {
 	histogram := make([]int, 72)
 
 	for _, hsvValue := range dataHSV {
