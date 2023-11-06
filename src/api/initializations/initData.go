@@ -7,7 +7,7 @@ var Combinations []schema.Combination
 func InitCombinations() {
 	hRanges := [][2]float64{
 		{316, 360},
-		{1, 25},
+		{0, 25},
 		{26, 40},
 		{41, 120},
 		{121, 190},

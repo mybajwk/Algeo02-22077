@@ -5,6 +5,7 @@ import (
 	"algeo02/schema"
 	_ "image/jpeg"
 	_ "image/png"
+	"sync"
 )
 
 func isWithinCombination(hsv schema.HSV, combination schema.Combination) bool {
@@ -14,15 +15,25 @@ func isWithinCombination(hsv schema.HSV, combination schema.Combination) bool {
 }
 
 func GetVector(dataHSV []schema.HSV) []int {
-	histogram := make([]int, 72)
+	histogram := make([]int, len(initializations.Combinations))
+	var wg sync.WaitGroup
+	var mu sync.Mutex
 
 	for _, hsvValue := range dataHSV {
-		for i, combination := range initializations.Combinations {
-			if isWithinCombination(hsvValue, combination) {
-				histogram[i]++
-				break // No need check again
+		wg.Add(1)
+		go func(hsvValue schema.HSV) {
+			defer wg.Done()
+			for i, combination := range initializations.Combinations {
+				if isWithinCombination(hsvValue, combination) {
+					mu.Lock()
+					histogram[i]++
+					mu.Unlock()
+					break
+				}
 			}
-		}
+		}(hsvValue)
 	}
+
+	wg.Wait()
 	return histogram
 }

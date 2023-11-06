@@ -8,8 +8,10 @@ import (
 	"image"
 	_ "image/jpeg"
 	"image/png"
+	"io/fs"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"net/http"
 
@@ -53,7 +55,7 @@ func Check(context *gin.Context) {
 
 	bounds := img.Bounds()
 	width, height := bounds.Max.X, bounds.Max.Y
-	rgbMatrix := make([]schema.HSV, height)
+	rgbMatrix := make([]schema.HSV, height*width)
 
 	idx := 0
 
@@ -61,10 +63,8 @@ func Check(context *gin.Context) {
 		for x := 0; x < width; x++ {
 			r, g, b, _ := img.At(x, y).RGBA()
 			rgbMatrix[idx] = utilities.ConvertRGBToHSV(r, g, b)
-
+			idx++
 		}
-
-		idx++
 	}
 	vector := utilities.GetVector(rgbMatrix)
 	context.JSON(http.StatusOK, gin.H{"success": true, "data": vector})
@@ -99,62 +99,71 @@ func CheckV1(context *gin.Context) {
 	}
 
 	// Iterate over the files in the directory
-	for _, file := range files {
+	vector := make(map[int][]int)
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+	limit := make(chan struct{}, 130)
+	for i, file := range files {
+		limit <- struct{}{}
+		wg.Add(1)
+		go func(file fs.DirEntry, i int) {
+			defer func() {
+				<-limit // Release the slot when the goroutine is done
+				wg.Done()
+			}()
+			if !file.IsDir() {
 
-		if file.IsDir() {
-			// Skip directories
-			continue
-		}
+				// Get the file name
+				fileName := file.Name()
 
-		// Get the file name
-		fileName := file.Name()
+				// Read the contents of the file
+				filePath := filepath.Join("data", fileName)
+				file, err := os.Open(filePath)
+				if err != nil {
+					log.Err(err).Msg("Error open file")
 
-		// Read the contents of the file
-		filePath := filepath.Join("data", fileName)
-		file, err := os.Open(filePath)
-		if err != nil {
-			log.Err(err).Msg("Error open file")
+					return
+				}
+				defer file.Close()
 
-			return
-		}
-		defer file.Close()
+				// command dl sementa
 
-		// command dl sementa
+				// pixels, err := getPixels(file)
 
-		// pixels, err := getPixels(file)
+				// if err != nil {
+				// 	fmt.Println("Error: Image could not be decoded")
+				// 	os.Exit(1)
+				// }
 
-		// if err != nil {
-		// 	fmt.Println("Error: Image could not be decoded")
-		// 	os.Exit(1)
-		// }
+				// fmt.Println(pixels)
 
-		// fmt.Println(pixels)
+				image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
+				// Decode the image into an image.Image
+				img, _, err := image.Decode(file)
+				if err != nil {
+					log.Err(err).Msg("Error Decode Image")
+					return
+				}
 
-		image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
-		// Decode the image into an image.Image
-		img, _, err := image.Decode(file)
-		if err != nil {
-			log.Err(err).Msg("Error Decode Image")
-			return
-		}
+				bounds := img.Bounds()
+				width, height := bounds.Max.X, bounds.Max.Y
+				rgbMatrix := make([]schema.HSV, height*width)
 
-		bounds := img.Bounds()
-		width, height := bounds.Max.X, bounds.Max.Y
-		rgbMatrix := make([]schema.HSV, height)
+				idx := 0
 
-		idx := 0
-
-		for y := 0; y < height; y++ {
-			for x := 0; x < width; x++ {
-				r, g, b, _ := img.At(x, y).RGBA()
-				rgbMatrix[idx] = utilities.ConvertRGBToHSV(r, g, b)
-
+				for y := 0; y < height; y++ {
+					for x := 0; x < width; x++ {
+						r, g, b, _ := img.At(x, y).RGBA()
+						rgbMatrix[idx] = utilities.ConvertRGBToHSV(r, g, b)
+						idx++
+					}
+				}
+				mu.Lock()
+				vector[i] = utilities.GetVector(rgbMatrix)
+				mu.Unlock()
 			}
-
-			idx++
-		}
-		_ = utilities.GetVector(rgbMatrix)
-
+		}(file, i)
 	}
-	context.JSON(http.StatusOK, gin.H{"success": true, "data": ""})
+	wg.Wait()
+	context.JSON(http.StatusOK, gin.H{"success": true, "data": vector[0]})
 }
