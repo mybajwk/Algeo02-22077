@@ -1,0 +1,2 @@
+{"level":"info","time":"2023-11-07T10:15:40+07:00","message":"Hello World!"}
+{"level":"info","time":"2023-11-07T10:15:40+07:00","message":"Server running on port 3000"}

@@ -18,10 +18,15 @@ func main() {
 	api.SetupApiRoute(router)
 	var port string = os.Getenv("PORT")
 
+	// activate logging
+	// utilities.ActivateLogging()
+
 	if port == "" {
 		port = "3000"
 	}
-	router.Run(":" + port)
+
+	log.Info().Msg("Hello World!")
 	log.Info().Msg("Server running on port " + port)
+	router.Run(":" + port)
 
 }

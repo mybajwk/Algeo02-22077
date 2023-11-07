@@ -5,6 +5,8 @@ import (
 	"algeo02/utilities"
 	"bytes"
 	"encoding/base64"
+	"encoding/json"
+	"fmt"
 	"image"
 	_ "image/jpeg"
 	"image/png"
@@ -68,6 +70,7 @@ func Check(context *gin.Context) {
 	}
 	vector := utilities.GetVector(rgbMatrix)
 	context.JSON(http.StatusOK, gin.H{"success": true, "data": vector})
+	log.Info().Msg("Yey Success")
 }
 func CheckV1(context *gin.Context) {
 
@@ -165,5 +168,23 @@ func CheckV1(context *gin.Context) {
 		}(file, i)
 	}
 	wg.Wait()
+	// Specify the file path and name
+	filePath := "data.json"
+
+	// Open a file for writing
+	file, err := os.Create(filePath)
+	if err != nil {
+		fmt.Println("Error creating file:", err)
+		return
+	}
+	defer file.Close()
+
+	// Create an encoder for JSON
+	encoder := json.NewEncoder(file)
+
+	// Encode and write the data to the file
+	if err := encoder.Encode(vector); err != nil {
+		fmt.Println("Error encoding data to JSON:", err)
+	}
 	context.JSON(http.StatusOK, gin.H{"success": true, "dataas": vector[0]})
 }

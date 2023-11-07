@@ -13,18 +13,49 @@ func GetVector(data []schema.HSV) []int {
 
 	histogram := make([]int, 72)
 
-	for i, h := range hRanges {
-		for j, s := range sRanges {
-			for k, v := range vRanges {
-				for _, hsv := range data {
-					if h[0] <= hsv.H && hsv.H <= h[1] &&
-						s[0] <= hsv.S && hsv.S < s[1] &&
-						v[0] <= hsv.V && hsv.V < v[1] {
-						histogram[i*9+j*3+k]++
-					}
-				}
+	rangeMap := make(map[int]int)
+	for i := 0; i < len(hRanges); i++ {
+		for j := 0; j < len(sRanges); j++ {
+			for k := 0; k < len(vRanges); k++ {
+				rangeMap[i*9+j*3+k] = 0
 			}
 		}
+	}
+
+	for _, hsv := range data {
+		hIndex := -1
+		sIndex := -1
+		vIndex := -1
+
+		for i, h := range hRanges {
+			if h[0] <= hsv.H && hsv.H <= h[1] {
+				hIndex = i
+				break
+			}
+		}
+
+		for j, s := range sRanges {
+			if s[0] <= hsv.S && hsv.S < s[1] {
+				sIndex = j
+				break
+			}
+		}
+
+		for k, v := range vRanges {
+			if v[0] <= hsv.V && hsv.V < v[1] {
+				vIndex = k
+				break
+			}
+		}
+
+		if hIndex != -1 && sIndex != -1 && vIndex != -1 {
+			index := hIndex*9 + sIndex*3 + vIndex
+			rangeMap[index]++
+		}
+	}
+
+	for index, count := range rangeMap {
+		histogram[index] = count
 	}
 
 	return histogram
