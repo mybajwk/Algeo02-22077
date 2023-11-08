@@ -57,19 +57,102 @@ func Check(context *gin.Context) {
 
 	bounds := img.Bounds()
 	width, height := bounds.Max.X, bounds.Max.Y
-	rgbMatrix := make([]schema.HSV, height*width)
+	h1 := height / 3
+	h2 := 2 * h1
+	w1 := width / 3
+	w2 := 2 * w1
 
+	rgbMatrix1 := make([]schema.HSV, h1*w1)
+	rgbMatrix2 := make([]schema.HSV, h1*w1)
+	rgbMatrix3 := make([]schema.HSV, h1*(width-w2))
+	rgbMatrix4 := make([]schema.HSV, h1*w1)
+	rgbMatrix5 := make([]schema.HSV, h1*w1)
+	rgbMatrix6 := make([]schema.HSV, h1*(width-w2))
+	rgbMatrix7 := make([]schema.HSV, (height-h2)*w1)
+	rgbMatrix8 := make([]schema.HSV, (height-h2)*w1)
+	rgbMatrix9 := make([]schema.HSV, (height-h2)*(width-w2))
 	idx := 0
-
-	for y := 0; y < height; y++ {
-		for x := 0; x < width; x++ {
+	for y := 0; y < h1; y++ {
+		for x := 0; x < w1; x++ {
 			r, g, b, _ := img.At(x, y).RGBA()
-			rgbMatrix[idx] = utilities.ConvertRGBToHSV(r, g, b)
+			rgbMatrix1[idx] = utilities.ConvertRGBToHSV(r, g, b)
 			idx++
 		}
 	}
-	vector := utilities.GetVector(rgbMatrix)
-	context.JSON(http.StatusOK, gin.H{"success": true, "data": vector})
+	idx = 0
+	for y := 0; y < h1; y++ {
+		for x := w1; x < w2; x++ {
+			r, g, b, _ := img.At(x, y).RGBA()
+			rgbMatrix2[idx] = utilities.ConvertRGBToHSV(r, g, b)
+			idx++
+		}
+	}
+	idx = 0
+	for y := 0; y < h1; y++ {
+		for x := w2; x < width; x++ {
+			r, g, b, _ := img.At(x, y).RGBA()
+			rgbMatrix3[idx] = utilities.ConvertRGBToHSV(r, g, b)
+			idx++
+		}
+	}
+	idx = 0
+	for y := h1; y < h2; y++ {
+		for x := 0; x < w1; x++ {
+			r, g, b, _ := img.At(x, y).RGBA()
+			rgbMatrix4[idx] = utilities.ConvertRGBToHSV(r, g, b)
+			idx++
+		}
+	}
+	idx = 0
+	for y := h1; y < h2; y++ {
+		for x := w1; x < w2; x++ {
+			r, g, b, _ := img.At(x, y).RGBA()
+			rgbMatrix5[idx] = utilities.ConvertRGBToHSV(r, g, b)
+			idx++
+		}
+	}
+	idx = 0
+	for y := h1; y < h2; y++ {
+		for x := w2; x < width; x++ {
+			r, g, b, _ := img.At(x, y).RGBA()
+			rgbMatrix6[idx] = utilities.ConvertRGBToHSV(r, g, b)
+			idx++
+		}
+	}
+	idx = 0
+	for y := h2; y < height; y++ {
+		for x := 0; x < w1; x++ {
+			r, g, b, _ := img.At(x, y).RGBA()
+			rgbMatrix7[idx] = utilities.ConvertRGBToHSV(r, g, b)
+			idx++
+		}
+	}
+	idx = 0
+	for y := h2; y < height; y++ {
+		for x := w1; x < w2; x++ {
+			r, g, b, _ := img.At(x, y).RGBA()
+			rgbMatrix8[idx] = utilities.ConvertRGBToHSV(r, g, b)
+			idx++
+		}
+	}
+	idx = 0
+	for y := h2; y < height; y++ {
+		for x := w2; x < width; x++ {
+			r, g, b, _ := img.At(x, y).RGBA()
+			rgbMatrix9[idx] = utilities.ConvertRGBToHSV(r, g, b)
+			idx++
+		}
+	}
+	_ = utilities.GetVector(rgbMatrix1)
+	_ = utilities.GetVector(rgbMatrix2)
+	_ = utilities.GetVector(rgbMatrix3)
+	_ = utilities.GetVector(rgbMatrix4)
+	_ = utilities.GetVector(rgbMatrix5)
+	_ = utilities.GetVector(rgbMatrix6)
+	_ = utilities.GetVector(rgbMatrix7)
+	_ = utilities.GetVector(rgbMatrix8)
+	_ = utilities.GetVector(rgbMatrix9)
+	// context.JSON(http.StatusOK, gin.H{"success": true, "data": vector2})
 	log.Info().Msg("Yey Success")
 }
 func CheckV1(context *gin.Context) {
@@ -104,7 +187,7 @@ func CheckV1(context *gin.Context) {
 	// Iterate over the files in the directory
 	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
 
-	vector := make(map[int][]int)
+	vector := make(map[int][][]int)
 	var wg sync.WaitGroup
 	var mu sync.Mutex
 	limit := make(chan struct{}, 130)
@@ -133,27 +216,108 @@ func CheckV1(context *gin.Context) {
 					return
 				}
 
-				// Initialize rgbMatrix...
 				bounds := img.Bounds()
 				width, height := bounds.Max.X, bounds.Max.Y
-				rgbMatrix := make([]schema.HSV, height*width)
+				h1 := height / 3
+				h2 := 2 * h1
+				w1 := width / 3
+				w2 := 2 * w1
 
-				// Process the image...
+				rgbMatrix1 := make([]schema.HSV, h1*w1)
+				rgbMatrix2 := make([]schema.HSV, h1*w1)
+				rgbMatrix3 := make([]schema.HSV, h1*(width-w2))
+				rgbMatrix4 := make([]schema.HSV, h1*w1)
+				rgbMatrix5 := make([]schema.HSV, h1*w1)
+				rgbMatrix6 := make([]schema.HSV, h1*(width-w2))
+				rgbMatrix7 := make([]schema.HSV, (height-h2)*w1)
+				rgbMatrix8 := make([]schema.HSV, (height-h2)*w1)
+				rgbMatrix9 := make([]schema.HSV, (height-h2)*(width-w2))
 				idx := 0
-				for y := 0; y < height; y++ {
-					for x := 0; x < width; x++ {
+				for y := 0; y < h1; y++ {
+					for x := 0; x < w1; x++ {
 						r, g, b, _ := img.At(x, y).RGBA()
-						rgbMatrix[idx] = utilities.ConvertRGBToHSV(r, g, b)
+						rgbMatrix1[idx] = utilities.ConvertRGBToHSV(r, g, b)
 						idx++
 					}
 				}
-
-				// Get vector representation...
-				resultVector := utilities.GetVector(rgbMatrix)
+				idx = 0
+				for y := 0; y < h1; y++ {
+					for x := w1; x < w2; x++ {
+						r, g, b, _ := img.At(x, y).RGBA()
+						rgbMatrix2[idx] = utilities.ConvertRGBToHSV(r, g, b)
+						idx++
+					}
+				}
+				idx = 0
+				for y := 0; y < h1; y++ {
+					for x := w2; x < width; x++ {
+						r, g, b, _ := img.At(x, y).RGBA()
+						rgbMatrix3[idx] = utilities.ConvertRGBToHSV(r, g, b)
+						idx++
+					}
+				}
+				idx = 0
+				for y := h1; y < h2; y++ {
+					for x := 0; x < w1; x++ {
+						r, g, b, _ := img.At(x, y).RGBA()
+						rgbMatrix4[idx] = utilities.ConvertRGBToHSV(r, g, b)
+						idx++
+					}
+				}
+				idx = 0
+				for y := h1; y < h2; y++ {
+					for x := w1; x < w2; x++ {
+						r, g, b, _ := img.At(x, y).RGBA()
+						rgbMatrix5[idx] = utilities.ConvertRGBToHSV(r, g, b)
+						idx++
+					}
+				}
+				idx = 0
+				for y := h1; y < h2; y++ {
+					for x := w2; x < width; x++ {
+						r, g, b, _ := img.At(x, y).RGBA()
+						rgbMatrix6[idx] = utilities.ConvertRGBToHSV(r, g, b)
+						idx++
+					}
+				}
+				idx = 0
+				for y := h2; y < height; y++ {
+					for x := 0; x < w1; x++ {
+						r, g, b, _ := img.At(x, y).RGBA()
+						rgbMatrix7[idx] = utilities.ConvertRGBToHSV(r, g, b)
+						idx++
+					}
+				}
+				idx = 0
+				for y := h2; y < height; y++ {
+					for x := w1; x < w2; x++ {
+						r, g, b, _ := img.At(x, y).RGBA()
+						rgbMatrix8[idx] = utilities.ConvertRGBToHSV(r, g, b)
+						idx++
+					}
+				}
+				idx = 0
+				for y := h2; y < height; y++ {
+					for x := w2; x < width; x++ {
+						r, g, b, _ := img.At(x, y).RGBA()
+						rgbMatrix9[idx] = utilities.ConvertRGBToHSV(r, g, b)
+						idx++
+					}
+				}
+				result := make([][]int, 9)
+				result[0] = utilities.GetVector(rgbMatrix1)
+				result[1] = utilities.GetVector(rgbMatrix2)
+				result[2] = utilities.GetVector(rgbMatrix3)
+				result[3] = utilities.GetVector(rgbMatrix4)
+				result[4] = utilities.GetVector(rgbMatrix5)
+				result[5] = utilities.GetVector(rgbMatrix6)
+				result[6] = utilities.GetVector(rgbMatrix7)
+				result[7] = utilities.GetVector(rgbMatrix8)
+				result[8] = utilities.GetVector(rgbMatrix9)
 
 				// Lock once to update the map
 				mu.Lock()
-				vector[i] = resultVector
+				vector[i] = result
 				mu.Unlock()
 			}
 		}(file, i)
