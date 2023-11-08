@@ -102,58 +102,44 @@ func CheckV1(context *gin.Context) {
 	}
 
 	// Iterate over the files in the directory
+	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
+
 	vector := make(map[int][]int)
 	var wg sync.WaitGroup
 	var mu sync.Mutex
 	limit := make(chan struct{}, 130)
+
 	for i, file := range files {
-		limit <- struct{}{}
 		wg.Add(1)
 		go func(file fs.DirEntry, i int) {
-			defer func() {
-				<-limit // Release the slot when the goroutine is done
-				wg.Done()
-			}()
+			limit <- struct{}{} // Limit concurrency
+			defer wg.Done()
+			defer func() { <-limit }()
+
 			if !file.IsDir() {
-
-				// Get the file name
-				fileName := file.Name()
-
-				// Read the contents of the file
-				filePath := filepath.Join("data", fileName)
+				// Processing file...
+				filePath := filepath.Join("data", file.Name())
 				file, err := os.Open(filePath)
 				if err != nil {
 					log.Err(err).Msg("Error open file")
-
 					return
 				}
 				defer file.Close()
 
-				// command dl sementa
-
-				// pixels, err := getPixels(file)
-
-				// if err != nil {
-				// 	fmt.Println("Error: Image could not be decoded")
-				// 	os.Exit(1)
-				// }
-
-				// fmt.Println(pixels)
-
-				image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
-				// Decode the image into an image.Image
+				// Decode the image...
 				img, _, err := image.Decode(file)
 				if err != nil {
 					log.Err(err).Msg("Error Decode Image")
 					return
 				}
 
+				// Initialize rgbMatrix...
 				bounds := img.Bounds()
 				width, height := bounds.Max.X, bounds.Max.Y
 				rgbMatrix := make([]schema.HSV, height*width)
 
+				// Process the image...
 				idx := 0
-
 				for y := 0; y < height; y++ {
 					for x := 0; x < width; x++ {
 						r, g, b, _ := img.At(x, y).RGBA()
@@ -161,12 +147,18 @@ func CheckV1(context *gin.Context) {
 						idx++
 					}
 				}
+
+				// Get vector representation...
+				resultVector := utilities.GetVector(rgbMatrix)
+
+				// Lock once to update the map
 				mu.Lock()
-				vector[i] = utilities.GetVector(rgbMatrix)
+				vector[i] = resultVector
 				mu.Unlock()
 			}
 		}(file, i)
 	}
+
 	wg.Wait()
 	// Specify the file path and name
 	filePath := "data.json"

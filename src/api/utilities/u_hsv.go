@@ -5,9 +5,10 @@ import "algeo02/schema"
 func ConvertRGBToHSV(r, g, b uint32) schema.HSV {
 	// normalisasi rgb
 	var result schema.HSV
-	rf := float64(r) / 65535.0
-	gf := float64(g) / 65535.0
-	bf := float64(b) / 65535.0
+	const divisor = 65535.0
+	rf := float64(r) / divisor
+	gf := float64(g) / divisor
+	bf := float64(b) / divisor
 
 	// hitung hsv
 	maks := max(rf, max(gf, bf))
