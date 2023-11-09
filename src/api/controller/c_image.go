@@ -12,7 +12,6 @@ import (
 	_ "image/jpeg"
 	"image/png"
 	"os"
-	"strconv"
 	"sync"
 
 	"net/http"
@@ -223,18 +222,18 @@ func CheckV1(context *gin.Context) {
 				log.Err(err).Msg("Error Decode Image")
 				return
 			}
-			outputPath := strconv.Itoa(i) + ".png"
-			newFile, err := os.OpenFile(outputPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode())
-			if err != nil {
-				log.Err(err).Msg("Error Decode Image")
-			}
-			defer newFile.Close()
+			// newFile, err := os.Create(fmt.Sprintf("%d.png", i))
+			// if err != nil {
+			// 	fmt.Println("Error creating output file:", err)
+			// 	return
+			// }
+			// defer newFile.Close()
 
-			// Write the content to the new file
-			err = png.Encode(newFile, img) // Use png.Encode for PNG files
-			if err != nil {
-				log.Err(err).Msg("Error Decode Image")
-			}
+			// // Write the content to the new file
+			// err = png.Encode(newFile, img) // Use png.Encode for PNG files
+			// if err != nil {
+			// 	log.Err(err).Msg("Error Decode Image")
+			// }
 
 			bounds := img.Bounds()
 			width, height := bounds.Max.X, bounds.Max.Y
@@ -344,6 +343,35 @@ func CheckV1(context *gin.Context) {
 	}
 
 	wg.Wait()
+
+	go func() {
+		for i, file := range zipReader.File {
+			f, err := file.Open()
+			if err != nil {
+				log.Err(err).Msg("Error Bind JSON")
+			}
+			defer f.Close()
+
+			// Decode the image...
+			img, _, err := image.Decode(f)
+			if err != nil {
+				log.Err(err).Msg("Error Decode Image")
+				return
+			}
+			newFile, err := os.Create(fmt.Sprintf("%d.png", i))
+			if err != nil {
+				fmt.Println("Error creating output file:", err)
+				return
+			}
+			defer newFile.Close()
+
+			// Write the content to the new file
+			err = png.Encode(newFile, img) // Use png.Encode for PNG files
+			if err != nil {
+				log.Err(err).Msg("Error Decode Image")
+			}
+		}
+	}()
 	// Specify the file path and name
 	filePath := "data.json"
 
