@@ -25,9 +25,10 @@ func setupStaticRoute(router *gin.Engine) {
 }
 
 func setupPublicRoute(router *gin.Engine) {
-	publicRoutes := router.Group("/image/")
+	publicRoutes := router.Group("/image")
 
-	publicRoutes.POST("/", controller.Check)
+	publicRoutes.POST("", controller.Check)
+	publicRoutes.POST("/page/:page", controller.Pagination)
 	publicRoutes.POST("/upload-color", controller.UploadDataSetColor)
 	publicRoutes.POST("/a", controller.S)
 	// publicRoutes.POST("/upload-data", controller.UploadDataSet)
