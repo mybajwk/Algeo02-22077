@@ -142,19 +142,56 @@ func Check(context *gin.Context) {
 			idx++
 		}
 	}
-	_ = utilities.GetVector(rgbMatrix1)
-	_ = utilities.GetVector(rgbMatrix2)
-	_ = utilities.GetVector(rgbMatrix3)
-	_ = utilities.GetVector(rgbMatrix4)
-	_ = utilities.GetVector(rgbMatrix5)
-	_ = utilities.GetVector(rgbMatrix6)
-	_ = utilities.GetVector(rgbMatrix7)
-	_ = utilities.GetVector(rgbMatrix8)
-	_ = utilities.GetVector(rgbMatrix9)
-	// context.JSON(http.StatusOK, gin.H{"success": true, "data": vector2})
+	hist := make([][]int, 9)
+	hist[0] = utilities.GetVector(rgbMatrix1)
+	hist[1] = utilities.GetVector(rgbMatrix2)
+	hist[2] = utilities.GetVector(rgbMatrix3)
+	hist[3] = utilities.GetVector(rgbMatrix4)
+	hist[4] = utilities.GetVector(rgbMatrix5)
+	hist[5] = utilities.GetVector(rgbMatrix6)
+	hist[6] = utilities.GetVector(rgbMatrix7)
+	hist[7] = utilities.GetVector(rgbMatrix8)
+	hist[8] = utilities.GetVector(rgbMatrix9)
+
+	// read from json
+	file, err := os.Open("data.json")
+	if err != nil {
+		fmt.Println("Error opening file:", err)
+		return
+	}
+	defer file.Close()
+
+	var data map[int][][]int
+
+	decoder := json.NewDecoder(file)
+	if err := decoder.Decode(&data); err != nil {
+		fmt.Println("Error decoding JSON:", err)
+		return
+	}
+	idx = 1
+	result := make(map[int][]schema.Result)
+	for key, val := range data {
+		temp := 0.0
+		for i, value := range val {
+			temp += utilities.CosineSimilarityColor(value, hist[i])
+		}
+		temp /= 9
+		if temp > 0.6 {
+			if len(result[idx]) == 6 {
+				idx++
+			}
+			res := schema.Result{
+				Name:       key,
+				Similarity: temp,
+			}
+			result[idx] = append(result[idx], res)
+		}
+	}
+
+	context.JSON(http.StatusOK, gin.H{"success": true, "page": idx, "data": result})
 	log.Info().Msg("Yey Success")
 }
-func CheckV1(context *gin.Context) {
+func UploadDataSetColor(context *gin.Context) {
 
 	var input schema.CheckImageBodyRequest
 
@@ -180,19 +217,6 @@ func CheckV1(context *gin.Context) {
 	if err != nil {
 		log.Err(err).Msg("Error Bind JSON")
 	}
-
-	// imageData, err := base64.StdEncoding.DecodeString(input.Image)
-	// if err != nil {
-	// 	log.Err(err).Msg("Error Decode Base64")
-	// 	return
-	// }
-
-	// // Create a reader from the image data
-	// imageReader := bytes.NewReader(imageData)
-	// files, err := os.ReadDir("data")
-	// if err != nil {
-	// 	log.Err(err).Msg("Error open folder")
-	// }
 
 	// Iterate over the files in the directory
 	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
@@ -222,18 +246,6 @@ func CheckV1(context *gin.Context) {
 				log.Err(err).Msg("Error Decode Image")
 				return
 			}
-			// newFile, err := os.Create(fmt.Sprintf("%d.png", i))
-			// if err != nil {
-			// 	fmt.Println("Error creating output file:", err)
-			// 	return
-			// }
-			// defer newFile.Close()
-
-			// // Write the content to the new file
-			// err = png.Encode(newFile, img) // Use png.Encode for PNG files
-			// if err != nil {
-			// 	log.Err(err).Msg("Error Decode Image")
-			// }
 
 			bounds := img.Bounds()
 			width, height := bounds.Max.X, bounds.Max.Y
@@ -343,7 +355,10 @@ func CheckV1(context *gin.Context) {
 	}
 
 	wg.Wait()
-
+	err = os.MkdirAll("data/"+input.Token, os.ModeDir)
+	if err != nil {
+		log.Err(err).Msg("Error create folder")
+	}
 	go func() {
 		for i, file := range zipReader.File {
 			f, err := file.Open()
@@ -358,7 +373,7 @@ func CheckV1(context *gin.Context) {
 				log.Err(err).Msg("Error Decode Image")
 				return
 			}
-			newFile, err := os.Create(fmt.Sprintf("%d.png", i))
+			newFile, err := os.Create(fmt.Sprintf("data/"+input.Token+"/%d.png", i))
 			if err != nil {
 				fmt.Println("Error creating output file:", err)
 				return
@@ -366,14 +381,14 @@ func CheckV1(context *gin.Context) {
 			defer newFile.Close()
 
 			// Write the content to the new file
-			err = png.Encode(newFile, img) // Use png.Encode for PNG files
+			err = png.Encode(newFile, img)
 			if err != nil {
 				log.Err(err).Msg("Error Decode Image")
 			}
 		}
 	}()
 	// Specify the file path and name
-	filePath := "data.json"
+	filePath := "data/" + input.Token + "/data_color.json"
 
 	// Open a file for writing
 	file, err := os.Create(filePath)
