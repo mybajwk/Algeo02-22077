@@ -21,7 +21,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func Check(context *gin.Context) {
+func CheckColor(context *gin.Context) {
 
 	var input schema.CheckImageBodyRequest
 
@@ -56,102 +56,37 @@ func Check(context *gin.Context) {
 
 	bounds := img.Bounds()
 	width, height := bounds.Max.X, bounds.Max.Y
-	h1 := height / 3
-	h2 := 2 * h1
-	w1 := width / 3
-	w2 := 2 * w1
-
-	rgbMatrix1 := make([]schema.HSV, h1*w1)
-	rgbMatrix2 := make([]schema.HSV, h1*w1)
-	rgbMatrix3 := make([]schema.HSV, h1*(width-w2))
-	rgbMatrix4 := make([]schema.HSV, h1*w1)
-	rgbMatrix5 := make([]schema.HSV, h1*w1)
-	rgbMatrix6 := make([]schema.HSV, h1*(width-w2))
-	rgbMatrix7 := make([]schema.HSV, (height-h2)*w1)
-	rgbMatrix8 := make([]schema.HSV, (height-h2)*w1)
-	rgbMatrix9 := make([]schema.HSV, (height-h2)*(width-w2))
+	block := 4
+	h := make([]int, block+1)
+	w := make([]int, block+1)
+	for i := 0; i <= block; i++ {
+		h[i] = height * i / block
+		w[i] = width * i / block
+	}
+	rgbMatrix := make([][]schema.HSV, block*block)
 	idx := 0
-	for y := 0; y < h1; y++ {
-		for x := 0; x < w1; x++ {
-			r, g, b, _ := img.At(x, y).RGBA()
-			rgbMatrix1[idx] = utilities.ConvertRGBToHSV(r, g, b)
+
+	for i := 0; i < block; i++ {
+		for j := 0; j < block; j++ {
+			temp := 0
+			rgbMatrix[idx] = make([]schema.HSV, (h[i+1]-h[i])*(w[j+1]-w[j]))
+			print(rgbMatrix[i][0].H)
+			for y := 0; y < h[i+1]-h[i]; y++ {
+				for x := 0; x < w[j+1]-w[j]; x++ {
+					r, g, b, _ := img.At(x+w[j], y+h[i]).RGBA()
+					rgbMatrix[idx][temp] = utilities.ConvertRGBToHSV(r, g, b)
+					temp++
+
+				}
+			}
 			idx++
 		}
 	}
-	idx = 0
-	for y := 0; y < h1; y++ {
-		for x := w1; x < w2; x++ {
-			r, g, b, _ := img.At(x, y).RGBA()
-			rgbMatrix2[idx] = utilities.ConvertRGBToHSV(r, g, b)
-			idx++
-		}
+
+	hist := make([][]int, block*block)
+	for i := 0; i < block*block; i++ {
+		hist[i] = utilities.GetVector(rgbMatrix[i])
 	}
-	idx = 0
-	for y := 0; y < h1; y++ {
-		for x := w2; x < width; x++ {
-			r, g, b, _ := img.At(x, y).RGBA()
-			rgbMatrix3[idx] = utilities.ConvertRGBToHSV(r, g, b)
-			idx++
-		}
-	}
-	idx = 0
-	for y := h1; y < h2; y++ {
-		for x := 0; x < w1; x++ {
-			r, g, b, _ := img.At(x, y).RGBA()
-			rgbMatrix4[idx] = utilities.ConvertRGBToHSV(r, g, b)
-			idx++
-		}
-	}
-	idx = 0
-	for y := h1; y < h2; y++ {
-		for x := w1; x < w2; x++ {
-			r, g, b, _ := img.At(x, y).RGBA()
-			rgbMatrix5[idx] = utilities.ConvertRGBToHSV(r, g, b)
-			idx++
-		}
-	}
-	idx = 0
-	for y := h1; y < h2; y++ {
-		for x := w2; x < width; x++ {
-			r, g, b, _ := img.At(x, y).RGBA()
-			rgbMatrix6[idx] = utilities.ConvertRGBToHSV(r, g, b)
-			idx++
-		}
-	}
-	idx = 0
-	for y := h2; y < height; y++ {
-		for x := 0; x < w1; x++ {
-			r, g, b, _ := img.At(x, y).RGBA()
-			rgbMatrix7[idx] = utilities.ConvertRGBToHSV(r, g, b)
-			idx++
-		}
-	}
-	idx = 0
-	for y := h2; y < height; y++ {
-		for x := w1; x < w2; x++ {
-			r, g, b, _ := img.At(x, y).RGBA()
-			rgbMatrix8[idx] = utilities.ConvertRGBToHSV(r, g, b)
-			idx++
-		}
-	}
-	idx = 0
-	for y := h2; y < height; y++ {
-		for x := w2; x < width; x++ {
-			r, g, b, _ := img.At(x, y).RGBA()
-			rgbMatrix9[idx] = utilities.ConvertRGBToHSV(r, g, b)
-			idx++
-		}
-	}
-	hist := make([][]int, 9)
-	hist[0] = utilities.GetVector(rgbMatrix1)
-	hist[1] = utilities.GetVector(rgbMatrix2)
-	hist[2] = utilities.GetVector(rgbMatrix3)
-	hist[3] = utilities.GetVector(rgbMatrix4)
-	hist[4] = utilities.GetVector(rgbMatrix5)
-	hist[5] = utilities.GetVector(rgbMatrix6)
-	hist[6] = utilities.GetVector(rgbMatrix7)
-	hist[7] = utilities.GetVector(rgbMatrix8)
-	hist[8] = utilities.GetVector(rgbMatrix9)
 
 	// read from json
 	file, err := os.Open("data/" + input.Token + "/data_color.json")
@@ -173,9 +108,13 @@ func Check(context *gin.Context) {
 	for key, val := range data {
 		temp := 0.0
 		for i, value := range val {
-			temp += utilities.CosineSimilarityColor(value, hist[i])
+			temp1 := utilities.CosineSimilarityColor(value, hist[i])
+			temp += temp1
+			if i == 5 || i == 6 || i == 9 || i == 10 {
+				temp += temp1
+			}
 		}
-		temp /= 9
+		temp /= float64(block*block + 4)
 		if temp > 0.6 {
 			if len(result[idx]) == 6 {
 				idx++
@@ -266,106 +205,41 @@ func UploadDataSetColor(context *gin.Context) {
 
 			bounds := img.Bounds()
 			width, height := bounds.Max.X, bounds.Max.Y
-			h1 := height / 3
-			h2 := 2 * h1
-			w1 := width / 3
-			w2 := 2 * w1
-
-			rgbMatrix1 := make([]schema.HSV, h1*w1)
-			rgbMatrix2 := make([]schema.HSV, h1*w1)
-			rgbMatrix3 := make([]schema.HSV, h1*(width-w2))
-			rgbMatrix4 := make([]schema.HSV, h1*w1)
-			rgbMatrix5 := make([]schema.HSV, h1*w1)
-			rgbMatrix6 := make([]schema.HSV, h1*(width-w2))
-			rgbMatrix7 := make([]schema.HSV, (height-h2)*w1)
-			rgbMatrix8 := make([]schema.HSV, (height-h2)*w1)
-			rgbMatrix9 := make([]schema.HSV, (height-h2)*(width-w2))
+			block := 4
+			h := make([]int, block+1)
+			w := make([]int, block+1)
+			for i := 0; i <= block; i++ {
+				h[i] = height * i / block
+				w[i] = width * i / block
+			}
+			rgbMatrix := make([][]schema.HSV, block*block)
 			idx := 0
-			for y := 0; y < h1; y++ {
-				for x := 0; x < w1; x++ {
-					r, g, b, _ := img.At(x, y).RGBA()
-					rgbMatrix1[idx] = utilities.ConvertRGBToHSV(r, g, b)
+
+			for i := 0; i < block; i++ {
+				for j := 0; j < block; j++ {
+					temp := 0
+					rgbMatrix[idx] = make([]schema.HSV, (h[i+1]-h[i])*(w[j+1]-w[j]))
+					for y := 0; y < h[i+1]-h[i]; y++ {
+						for x := 0; x < w[j+1]-w[j]; x++ {
+							r, g, b, _ := img.At(x+w[j], y+h[i]).RGBA()
+							rgbMatrix[idx][temp] = utilities.ConvertRGBToHSV(r, g, b)
+							temp++
+
+						}
+					}
 					idx++
 				}
 			}
-			idx = 0
-			for y := 0; y < h1; y++ {
-				for x := w1; x < w2; x++ {
-					r, g, b, _ := img.At(x, y).RGBA()
-					rgbMatrix2[idx] = utilities.ConvertRGBToHSV(r, g, b)
-					idx++
-				}
+			temp := block * block
+
+			hist := make([][]int, temp)
+			for i := 0; i < temp; i++ {
+				hist[i] = utilities.GetVector(rgbMatrix[i])
 			}
-			idx = 0
-			for y := 0; y < h1; y++ {
-				for x := w2; x < width; x++ {
-					r, g, b, _ := img.At(x, y).RGBA()
-					rgbMatrix3[idx] = utilities.ConvertRGBToHSV(r, g, b)
-					idx++
-				}
-			}
-			idx = 0
-			for y := h1; y < h2; y++ {
-				for x := 0; x < w1; x++ {
-					r, g, b, _ := img.At(x, y).RGBA()
-					rgbMatrix4[idx] = utilities.ConvertRGBToHSV(r, g, b)
-					idx++
-				}
-			}
-			idx = 0
-			for y := h1; y < h2; y++ {
-				for x := w1; x < w2; x++ {
-					r, g, b, _ := img.At(x, y).RGBA()
-					rgbMatrix5[idx] = utilities.ConvertRGBToHSV(r, g, b)
-					idx++
-				}
-			}
-			idx = 0
-			for y := h1; y < h2; y++ {
-				for x := w2; x < width; x++ {
-					r, g, b, _ := img.At(x, y).RGBA()
-					rgbMatrix6[idx] = utilities.ConvertRGBToHSV(r, g, b)
-					idx++
-				}
-			}
-			idx = 0
-			for y := h2; y < height; y++ {
-				for x := 0; x < w1; x++ {
-					r, g, b, _ := img.At(x, y).RGBA()
-					rgbMatrix7[idx] = utilities.ConvertRGBToHSV(r, g, b)
-					idx++
-				}
-			}
-			idx = 0
-			for y := h2; y < height; y++ {
-				for x := w1; x < w2; x++ {
-					r, g, b, _ := img.At(x, y).RGBA()
-					rgbMatrix8[idx] = utilities.ConvertRGBToHSV(r, g, b)
-					idx++
-				}
-			}
-			idx = 0
-			for y := h2; y < height; y++ {
-				for x := w2; x < width; x++ {
-					r, g, b, _ := img.At(x, y).RGBA()
-					rgbMatrix9[idx] = utilities.ConvertRGBToHSV(r, g, b)
-					idx++
-				}
-			}
-			result := make([][]int, 9)
-			result[0] = utilities.GetVector(rgbMatrix1)
-			result[1] = utilities.GetVector(rgbMatrix2)
-			result[2] = utilities.GetVector(rgbMatrix3)
-			result[3] = utilities.GetVector(rgbMatrix4)
-			result[4] = utilities.GetVector(rgbMatrix5)
-			result[5] = utilities.GetVector(rgbMatrix6)
-			result[6] = utilities.GetVector(rgbMatrix7)
-			result[7] = utilities.GetVector(rgbMatrix8)
-			result[8] = utilities.GetVector(rgbMatrix9)
 
 			// Lock once to update the map
 			mu.Lock()
-			vector[i] = result
+			vector[i] = hist
 			mu.Unlock()
 
 		}(file, i)
