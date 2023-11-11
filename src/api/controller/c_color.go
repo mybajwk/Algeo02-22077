@@ -154,7 +154,7 @@ func Check(context *gin.Context) {
 	hist[8] = utilities.GetVector(rgbMatrix9)
 
 	// read from json
-	file, err := os.Open("data/"+input.Token+"/data_color.json")
+	file, err := os.Open("data/" + input.Token + "/data_color.json")
 	if err != nil {
 		fmt.Println("Error opening file:", err)
 		return
@@ -186,6 +186,23 @@ func Check(context *gin.Context) {
 			}
 			result[idx] = append(result[idx], res)
 		}
+	}
+	filePath := "data/" + input.Token + "/result.json"
+
+	// Open a file for writing
+	fileResult, err := os.Create(filePath)
+	if err != nil {
+		fmt.Println("Error creating file:", err)
+		return
+	}
+	defer fileResult.Close()
+
+	// Create an encoder for JSON
+	encoder := json.NewEncoder(fileResult)
+
+	// Encode and write the data to the file
+	if err := encoder.Encode(result); err != nil {
+		fmt.Println("Error encoding data to JSON:", err)
 	}
 
 	context.JSON(http.StatusOK, gin.H{"success": true, "page": idx, "data": result})
