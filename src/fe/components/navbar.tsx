@@ -8,13 +8,12 @@ import {
   NavbarBrand,
   NavbarMenuItem,
   Button,
-  Tabs,
-  Tab,
   NavbarItem,
   cn,
 } from "@nextui-org/react";
 
 import Link from "next/link";
+import { AiFillGithub } from "react-icons/ai";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -67,10 +66,10 @@ export const Navbar = () => {
         </NavbarContent>
         <NavbarContent className="sm:flex hidden gap-5" justify="center">
           {links.map((item) => (
-            <NavbarItem>
+            <NavbarItem key={item.label}>
               <p
                 className={cn(
-                  "cursor-pointer font-sans pb-2 hover:text-white relative w-fit block after:block after:content-[''] after:absolute after:h-[2px] after:bg-white after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-left",
+                  "cursor-pointer font-sans pb-2 hover:text-white relative w-fit block after:block after:content-[''] after:absolute after:h-[2px] after:bg-white after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-500 after:origin-left",
                   item.active
                     ? "text-white after:scale-x-100"
                     : "text-slate-500"
@@ -79,7 +78,7 @@ export const Navbar = () => {
                   setRedirect("yes");
                   setTimeout(() => {
                     router.push(item.href);
-                    if (pathName === item.href) setRedirect("")
+                    if (pathName === item.href) setRedirect("");
                   }, 1000);
                 }}
               >
@@ -102,9 +101,9 @@ export const Navbar = () => {
         </NavbarContent>
 
         <NavbarContent className="" justify="end">
-          <Button className="rounded-full pt-1 pb-[5px] bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%">
-            Try It
-          </Button>
+          <Link href="https://github.com/mybajwk/Algeo02-22077" className="text-white hover:text-slate-400" rel="noopener noreferrer" target="_blank">
+            <AiFillGithub size={30} />
+          </Link>
         </NavbarContent>
 
         <NavbarMenu className="z-[990]">

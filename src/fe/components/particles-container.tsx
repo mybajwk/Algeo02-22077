@@ -15,13 +15,13 @@ const ParticlesContainer = () => {
       init={particlesInit}
       loaded={particlesLoaded}
       options={{
-        fullScreen: { enable: true },
+        fullScreen: { enable: true, zIndex: 10 },
         background: {
           color: {
             value: ''
           }
         },
-        fpsLimit: 90,
+        fpsLimit: 60,
         interactivity: {
           events: {
             onClick: {
@@ -36,7 +36,7 @@ const ParticlesContainer = () => {
           },
           modes: {
             push: {
-              quantity: 120
+              quantity: 10
             },
             repulse: {
               distance: 80,
@@ -50,7 +50,7 @@ const ParticlesContainer = () => {
           },
           links: {
             color: '#A0E9FF',
-            distance: 150,
+            distance: 120,
             enable: true,
             opacity: 0.5,
             width: 1
@@ -88,7 +88,7 @@ const ParticlesContainer = () => {
             }
           },
         },
-        detectRetina: true
+        detectRetina: false
       }}
     />
   );

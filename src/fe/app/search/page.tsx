@@ -2,6 +2,7 @@
 
 import FileUpload from "@/components/file-upload";
 import ModalUpload from "@/components/modal-upload";
+import ParticlesContainer from "@/components/particles-container";
 import ResultContainer from "@/components/result-container";
 import Transition from "@/components/transition";
 import {
@@ -50,10 +51,11 @@ const SearchPage = () => {
       <AnimatePresence mode="wait">
         <motion.div
           key="home"
-          className="h-full"
+          className="absolute h-full"
         >
           <Transition />
         </motion.div>
+
         <div className="w-full h-full flex flex-col gap-5 pt-5">
           <div className="flex flex-row justify-between gap-6 w-full">
             <div

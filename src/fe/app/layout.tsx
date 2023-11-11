@@ -7,15 +7,15 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 const sora = Sora({
   subsets: ["latin"],
-  variable: '--font-sora',
-  weight: ['100', '200', '300', '400', '500', '600', '700', '800']
+  variable: "--font-sora",
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800"],
 });
 
 const splineSans = Spline_Sans({
   subsets: ["latin"],
-  variable: '--font-spline-sans',
-  weight: ['300', '400', '500', '600', '700']
-})
+  variable: "--font-spline-sans",
+  weight: ["300", "400", "500", "600", "700"],
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -30,15 +30,13 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${sora.variable} ${splineSans.variable}`}>
       <head />
-      <body
-        className={`bg-[url('/site-bg.svg')] bg-cover relative`}
-      >
-        <Providers>
-          <ScrollArea className="h-screen w-screen z-[100]">
+      <body className={`bg-[url('/site-bg.svg')] bg-cover relative  min-h-fit scroll-smooth`}>
+        <ScrollArea className="h-screen w-screen z-[990]">
+          <Providers>
             <Navbar />
-            <main className="px-[146px]">{children}</main>
-          </ScrollArea>
-        </Providers>
+            <main className="px-[146px] relative">{children}</main>
+          </Providers>
+        </ScrollArea>
       </body>
     </html>
   );

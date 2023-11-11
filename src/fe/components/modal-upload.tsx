@@ -4,7 +4,7 @@ import { Button } from "@nextui-org/react";
 import { FC, Key, useEffect, useState } from "react";
 import FileUploadFiles from "./file-upload-files";
 import { useTabs } from "@/hooks/use-tabs";
-import { Framer } from "@/components/ui/framer";
+import { Framer } from "@/components/framer";
 import { Dialog, DialogContent, DialogFooter } from "./ui/dialog";
 
 interface ModalUploadProps {
