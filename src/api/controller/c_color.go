@@ -154,7 +154,7 @@ func Check(context *gin.Context) {
 	hist[8] = utilities.GetVector(rgbMatrix9)
 
 	// read from json
-	file, err := os.Open("data/"+input.Token+"/data.json")
+	file, err := os.Open("data/"+input.Token+"/data_color.json")
 	if err != nil {
 		fmt.Println("Error opening file:", err)
 		return
