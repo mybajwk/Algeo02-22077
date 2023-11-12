@@ -31,7 +31,7 @@ const FileUpload: FC<FileUploadProps> = ({ photo, setPhoto }) => {
           setError("Photo type must be png, jpg, or jpeg!!");
           return;
         } else {
-          setPhoto(photoUploaded); // Update the state with the uploaded photo
+          setPhoto(photoUploaded); 
         }
       }
     }
@@ -70,11 +70,11 @@ const FileUpload: FC<FileUploadProps> = ({ photo, setPhoto }) => {
       onDrop={handleDrop}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
-      className="flex flex-col items-center justify-center w-full h-64 rounded-lg"
+      className="flex flex-col items-center justify-center w-full h-40 xl:h-64 rounded-lg"
     >
       <div className="w-full h-full flex flex-col items-center justify-center border-white rounded-md border-dashed border-[2px]">
         <svg
-          className="w-10 h-10 text-white"
+          className="w-8 h-8  xl:w-10 xl:h-10 text-white"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 20 16"
@@ -92,17 +92,26 @@ const FileUpload: FC<FileUploadProps> = ({ photo, setPhoto }) => {
         ) : (
           <></>
         )}
-        <p className="text-base text-white font-mono">
+        <p className="text-sm xl:text-base text-white font-mono">
           png, jpg, or jpeg <span className="font-semibold">(MAX 5MB)</span>
         </p>
-        <p className="text-base text-white font-mono">
+        <p className="text-sm xl:text-base text-white font-mono">
           Drag your files here or
         </p>
 
         <Button
           radius="md"
           size="md"
-          className="mt-4 text-blue-600"
+          className="mt-4 flex md:hidden xl:flex text-blue-600"
+          variant="faded"
+          onClick={handleClick}
+        >
+          Upload
+        </Button>
+        <Button
+          radius="md"
+          size="sm"
+          className="mt-4 xl:hidden hidden md:flex text-blue-600"
           variant="faded"
           onClick={handleClick}
         >

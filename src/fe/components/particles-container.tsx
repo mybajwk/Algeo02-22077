@@ -15,7 +15,7 @@ const ParticlesContainer = () => {
       init={particlesInit}
       loaded={particlesLoaded}
       options={{
-        fullScreen: { enable: true, zIndex: 10 },
+        fullScreen: { enable: true, zIndex: 1 },
         background: {
           color: {
             value: ''

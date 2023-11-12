@@ -14,10 +14,11 @@ import {
 import * as z from "zod";
 import { FileImage, FileUp, RotateCw, Trash2 } from "lucide-react";
 import Image from "next/image";
-import { Button, Divider } from "@nextui-org/react";
+import { Button, Divider, cn } from "@nextui-org/react";
 import { twMerge } from "tailwind-merge";
 import { ScrollArea } from "./ui/scroll-area";
 import { getAllFileEntries, getFile } from "@/lib/libs";
+import { waveform } from "ldrs";
 
 interface FileUploadFilesProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -41,14 +42,14 @@ export interface Image {
   error?: string;
 }
 
-const allowedFileTypes = ["image/png", "image/jpeg", "image/jpg"];
-const allowedZipTypes = [".zip", ".rar", ".7z", ".gz"];
+export const allowedFileTypes = ["image/png", "image/jpeg", "image/jpg"];
+export const allowedZipTypes = [".zip", ".rar", ".7z", ".gz"];
 
 const filesValidation = z
   .any()
   .refine((file) => {
-    return file.size <= 5000000;
-  }, "Max image size is 5MB")
+    return file.size <= 10000000;
+  }, "Max image size is 10MB")
   .refine((file) => {
     return allowedFileTypes.includes(file.type);
   }, "Only image type are supported");
@@ -56,21 +57,19 @@ const filesValidation = z
 const zipValidation = z
   .any()
   .refine((zip) => {
-    return zip.size <= 5000000;
-  }, "Max image size is 5MB")
+    return zip.size <= 10000000;
+  }, "Max image size is 10MB")
   .refine((zip) => {
     return zip.name.includes(...allowedZipTypes);
   }, "Only zip type are supported");
-/**
- * Kalau menggunakan react hook form maka yang perlu di kirim ke component ini adalah form.setValue
- * kalu tidak menggunakan react hook form dan hanya mau menggunakan useState biasa maka yang perlu dikirimkan adalah setState nya
- */
 
 const FileUploadFiles = forwardRef<HTMLInputElement, FileUploadFilesProps>(
   ({ setState, onChange, typeFile = "zip", type = "file", ...props }, ref) => {
+    waveform.register();
     const inputRef = useRef<HTMLInputElement>(null);
     const [images, setImages] = useState<Image[]>([]);
     const [indexRetry, setIndexRetry] = useState(-1);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
       if (setState) {
@@ -98,6 +97,8 @@ const FileUploadFiles = forwardRef<HTMLInputElement, FileUploadFilesProps>(
 
       if (typeFile === "folder") {
         if (e.dataTransfer.items) {
+          setLoading(true);
+
           const files = await getAllFileEntries(e.dataTransfer.items);
           for (let i = 0; i < files.length; i++) {
             const file = await getFile(files[i]);
@@ -119,13 +120,14 @@ const FileUploadFiles = forwardRef<HTMLInputElement, FileUploadFilesProps>(
         }
       } else {
         if (e.dataTransfer.files) {
+          setLoading(true);
+          
           for (let i = 0; i < e.dataTransfer.files.length; i++) {
             let validate;
             if (typeFile === "files") {
               validate = filesValidation.safeParse(e.dataTransfer.files[i]);
             } else {
               validate = zipValidation.safeParse(e.dataTransfer.files[i]);
-
             }
             let error = "";
 
@@ -142,6 +144,7 @@ const FileUploadFiles = forwardRef<HTMLInputElement, FileUploadFilesProps>(
             setImages((val) => [...val, image]);
           }
         }
+        setLoading(false);
       }
     };
 
@@ -149,7 +152,7 @@ const FileUploadFiles = forwardRef<HTMLInputElement, FileUploadFilesProps>(
       e.preventDefault();
 
       if (e.target.files) {
-        console.log(e.target.files[0])
+        setLoading(true);
         if (indexRetry === -1) {
           for (let i = 0; i < e.target.files.length; i++) {
             let validate;
@@ -157,7 +160,6 @@ const FileUploadFiles = forwardRef<HTMLInputElement, FileUploadFilesProps>(
               validate = filesValidation.safeParse(e.target.files[i]);
             } else {
               validate = zipValidation.safeParse(e.target.files[i]);
-
             }
             let error = "";
 
@@ -178,12 +180,11 @@ const FileUploadFiles = forwardRef<HTMLInputElement, FileUploadFilesProps>(
           }
         } else if (indexRetry > -1) {
           let validate;
-            if (typeFile === "files" || typeFile === "folder") {
-              validate = filesValidation.safeParse(e.target.files[0]);
-            } else {
-              validate = zipValidation.safeParse(e.target.files[0]);
-
-            }
+          if (typeFile === "files" || typeFile === "folder") {
+            validate = filesValidation.safeParse(e.target.files[0]);
+          } else {
+            validate = zipValidation.safeParse(e.target.files[0]);
+          }
           let error = "";
 
           if (!validate.success) {
@@ -205,6 +206,7 @@ const FileUploadFiles = forwardRef<HTMLInputElement, FileUploadFilesProps>(
           setIndexRetry(-1);
           if (inputRef.current) inputRef.current.multiple = true;
         }
+        setLoading(false);
       }
     };
 
@@ -226,10 +228,14 @@ const FileUploadFiles = forwardRef<HTMLInputElement, FileUploadFilesProps>(
     };
     const otherAtt = { directory: "", webkitdirectory: "" };
 
+    useEffect(() => {
+      console.log(loading);
+    }, [loading]);
+
     return (
-      <section className="flex h-fit min-w-full flex-col items-center justify-between gap-6 sm:min-w-[600px] sm:flex-row sm:items-start lg:min-w-[810px]">
+      <section className="flex h-fit min-w-full flex-col items-center justify-between gap-6 sm:flex-row sm:items-start">
         <div
-          className="border-white border-[2px] border-dashed flex h-[152px] min-w-[180px] max-w-[400px] flex-col items-center justify-center gap-4 rounded-[14px] bg-clip-padding p-6 sm:h-[278px] sm:flex-[0.8] "
+          className="border-white border-[2px] border-dashed flex h-[170px] min-w-[190px] max-w-[400px] flex-col items-center justify-center gap-4 rounded-[14px] bg-clip-padding p-6 sm:h-[278px] sm:flex-[0.8] "
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -258,6 +264,7 @@ const FileUploadFiles = forwardRef<HTMLInputElement, FileUploadFilesProps>(
             onClick={handleClick}
             variant="faded"
             color="primary"
+            size="md"
           >
             Choose{" "}
             {typeFile === "zip"
@@ -308,14 +315,19 @@ const FileUploadFiles = forwardRef<HTMLInputElement, FileUploadFilesProps>(
             <></>
           )}
         </div>
-        <div className="flex h-[278px] w-full flex-col justify-start sm:flex-[1.1]">
+        <div className="flex h-[120px] sm:h-[278px] w-full flex-col justify-start sm:flex-[1.1]">
           <h2 className="w-full font-anderson text-base text-white:text-2xl">
-            Uploaded{" "}
-            {typeFile === "zip"
-              ? "zip"
-              : "files"}
+            Uploaded {typeFile === "zip" ? "zip" : "files"}
           </h2>
           <Divider className="my-2 h-[1px] bg-white" />
+          <div
+            className={cn(
+              "w-full h-full justify-center items-center text-white",
+              loading ? "flex" : "hidden"
+            )}
+          >
+            <l-waveform color="white"></l-waveform>
+          </div>
           <FileItems
             images={images}
             handleDelete={handleDelete}

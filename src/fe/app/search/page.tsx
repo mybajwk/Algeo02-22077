@@ -2,64 +2,114 @@
 
 import FileUpload from "@/components/file-upload";
 import ModalUpload from "@/components/modal-upload";
-import ParticlesContainer from "@/components/particles-container";
 import ResultContainer from "@/components/result-container";
 import Transition from "@/components/transition";
+import { convertFileToBase64 } from "@/lib/libs";
 import {
   Button,
-  Card,
-  CardFooter,
   Divider,
   Image,
   Pagination,
   Skeleton,
   Tab,
   Tabs,
-  useDisclosure,
+  cn,
 } from "@nextui-org/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Trash2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { twMerge } from "tailwind-merge";
+import toast from "react-hot-toast";
+
+interface ImagesData {
+  url: string;
+  similarity: string;
+}
+
+const paginationAnimationVariant = {
+  next: {
+    translateX: "100%",
+    opacity: 0,
+  },
+  prev: {
+    translateX: "-100%",
+    opacity: 0,
+  },
+};
 
 const SearchPage = () => {
+  const urls = ["a", "b", "c", "d", "e", "f", "g", "h"];
+  const urls2 = ["1", "2", "3", "4", "5", "6", "7", "8"];
   const [photo, setPhoto] = useState<File | null>(null);
   const [urlImg, setUrlImg] = useState<string>("");
   const [open, setOpen] = useState(false);
+  const [imagesData, setImagesData] = useState<string[]>(urls);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [paginationStatus, setPaginationStatus] = useState("");
   const handleOnDelete = () => {
     setPhoto(null);
     setUrlImg("");
   };
-
-  const urls = ["", "", "", "", "", "", "", ""];
 
   const handleOpenModal = () => {
     setOpen(true);
   };
 
   useEffect(() => {
-    
     if (photo) {
       const url = URL.createObjectURL(photo);
       setUrlImg(url);
     }
   }, [photo]);
 
+  const handleOnSubmit = async () => {
+    try {
+      if (photo) {
+        const base64File = await convertFileToBase64(photo);
+
+        //fetch API
+
+        toast.success("photo uploaded succesfull");
+      }
+    } catch (error) {
+      if (error instanceof Error) toast.error(error.message);
+    }
+  };
+
+  const handlePaginatiOnChange = async (page: number) => {
+    try {
+      // const response = await fetch("");
+
+      // const bodyRes = await response.json();
+
+      // if (!response.ok) {
+      // } else {
+      //   setImagesData([]);
+      // }
+      if (page > currentPage) {
+        setPaginationStatus("next");
+      } else if (page < currentPage) {
+        setPaginationStatus("prev");
+      }
+      setCurrentPage(page);
+      if (page === 2) setImagesData([...urls2]);
+      if (page === 1) setImagesData([...urls]);
+    } catch (error) {
+      if (error instanceof Error) toast.error(error.message);
+    }
+  };
+
   return (
     <>
       <ModalUpload open={open} onOpenChange={setOpen} />
       <AnimatePresence mode="wait">
-        <motion.div
-          key="home"
-          className="absolute h-full"
-        >
+        <motion.div key="home" className="absolute h-full">
           <Transition />
         </motion.div>
 
         <div className="w-full h-full flex flex-col gap-5 pt-5">
-          <div className="flex flex-row justify-between gap-6 w-full">
+          <div className="flex flex-col med2:flex-row h-full  justify-between gap-6 w-full">
             <div
-              className={`relative flex-[1.2] h-[450px] flex justify-center items-center rounded-md group overflow-hidden`}
+              className={`relative med2:flex-[1.2] w-full h-[300px] xl:h-[450px] flex justify-center items-center rounded-md group overflow-hidden`}
             >
               <Image
                 src={urlImg}
@@ -102,14 +152,15 @@ const SearchPage = () => {
                 </>
               )}
             </div>
-            <div className="flex flex-[1] flex-col justify-between items-end w-full bg-">
+            <div className="flex flex-[1] flex-col justify-between w-full h-[300px] xl:h-[450px] gap-2">
               <div className="w-full">
                 <label className="text-base font-sans">Upload a image: </label>
                 <FileUpload photo={photo} setPhoto={setPhoto} />
               </div>
-              <div className="w-full h-fit flex flex-col gap-2">
-                <div className="flex flex-row w-full gap-2 items-center">
+              <div className="w-full h-fit flex flex-col justify-center items-end gap-2">
+                <div className="flex flex-col sm:flex-row w-full gap-2 items-center">
                   <Tabs
+                    size="md"
                     aria-label="Options"
                     radius="md"
                     variant="bordered"
@@ -118,7 +169,23 @@ const SearchPage = () => {
                       tabList: "gap-4 border-indigo-800 bg-[#0300145e] w-full",
                       cursor:
                         "bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%",
-                      base: "flex-[1.2]",
+                      base: "lg:flex md2:hidden sm:flex-[1.5] xl:flex-[1.2] w-full",
+                    }}
+                  >
+                    <Tab key="color" title="Color" />
+                    <Tab key="texture" title="Texture" />
+                  </Tabs>
+                  <Tabs
+                    size="sm"
+                    aria-label="Options"
+                    radius="md"
+                    variant="bordered"
+                    color="primary"
+                    classNames={{
+                      tabList: "gap-4 border-indigo-800 bg-[#0300145e] w-full",
+                      cursor:
+                        "bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%",
+                      base: "hidden md2:flex lg:hidden sm:flex-[1.5] xl:flex-[1.2] w-full",
                     }}
                   >
                     <Tab key="color" title="Color" />
@@ -127,21 +194,45 @@ const SearchPage = () => {
 
                   <Button
                     color="primary"
-                    className="flex-1 bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%"
+                    size="md"
+                    className="lg:flex flex md2:hidden w-full sm:flex-1 bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%"
+                    onPress={handleOpenModal}
+                  >
+                    Upload dataset
+                  </Button>
+                  <Button
+                    color="primary"
+                    size="sm"
+                    className="hidden md2:flex lg:hidden w-full sm:flex-1 bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%"
                     onPress={handleOpenModal}
                   >
                     Upload dataset
                   </Button>
                 </div>
                 <Button
+                  onPress={handleOnSubmit}
                   variant={`${photo ? "flat" : "faded"}`}
-                  className={twMerge(
-                    "w-full",
+                  className={cn(
+                    "flex md2:hidden lg:flex w-full",
                     photo
-                      ? "transform duration-[0.5s] ease-in-out hover:scale-[1.03] hover:text-white hover:after:translate-x-0 hover:after:translate-y-0  after:absolute after:origin-left after:transform after:ease-out after:translate-x-[-110%] after:translate-y-0 after:duration-[0.5s] after:left-0 after:z-[-1] after:content-[''] after:w-full after:h-full after:bg-gradient-to-br after:from-indigo-800 after:via-blue-800 after:via-30% after:to-blue-600 after:to-80%"
+                      ? "transform duration-[0.5s] md ease-in-out hover:scale-[1.03] hover:text-white hover:after:translate-x-0 hover:after:translate-y-0  after:absolute after:origin-left after:transform after:ease-out after:translate-x-[-110%] after:translate-y-0 after:duration-[0.5s] after:left-0 after:z-[-1] after:content-[''] after:w-full after:h-full after:bg-gradient-to-br after:from-indigo-800 after:via-blue-800 after:via-30% after:to-blue-600 after:to-80%"
                       : ""
                   )}
                   size="md"
+                  color="primary"
+                >
+                  Submit
+                </Button>
+                <Button
+                  onPress={handleOnSubmit}
+                  variant={`${photo ? "flat" : "faded"}`}
+                  className={cn(
+                    "lg:hidden hidden md2:flex w-full",
+                    photo
+                      ? "transform duration-[0.5s] md ease-in-out hover:scale-[1.03] hover:text-white hover:after:translate-x-0 hover:after:translate-y-0  after:absolute after:origin-left after:transform after:ease-out after:translate-x-[-110%] after:translate-y-0 after:duration-[0.5s] after:left-0 after:z-[-1] after:content-[''] after:w-full after:h-full after:bg-gradient-to-br after:from-indigo-800 after:via-blue-800 after:via-30% after:to-blue-600 after:to-80%"
+                      : ""
+                  )}
+                  size="sm"
                   color="primary"
                 >
                   Submit
@@ -153,18 +244,45 @@ const SearchPage = () => {
           <div className="flex flex-col w-full justify-center items-center gap-3">
             <div className="w-full">
               <div className="flex flex-row justify-between items-center p-1">
-                <h2 className="text-xl">Result</h2>
-                <p className="text-md">Executed Time 13.5s</p>
+                <h2 className="text-lg md:text-xl">Result</h2>
+                <p className="text-base md:text-md">Executed Time 13.5s</p>
               </div>
             </div>
-            <ResultContainer urls={urls} />
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentPage}
+                className="h-full w-full flex justify-center items-center overflow-hidden"
+                exit={paginationStatus === "next" ? "prev" : "next"}
+                initial={paginationStatus === "next" ? "prev" : "next"}
+                animate={{ opacity: 100, translateX: "0%" }}
+                transition={{ ease: "easeInOut", delay: 0.1, duration: 0.4 }}
+                variants={paginationAnimationVariant}
+              >
+                <ResultContainer urls={imagesData} />
+              </motion.div>
+            </AnimatePresence>
             <Pagination
+              size="md"
+              onChange={handlePaginatiOnChange}
               showControls
               total={10}
               initialPage={1}
               classNames={{
                 cursor:
                   "bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%",
+                base: "md:flex hidden",
+              }}
+            />
+            <Pagination
+              size="sm"
+              onChange={handlePaginatiOnChange}
+              showControls
+              total={10}
+              initialPage={1}
+              classNames={{
+                cursor:
+                  "bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%",
+                base: "flex md:hidden",
               }}
             />
           </div>

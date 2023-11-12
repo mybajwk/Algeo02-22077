@@ -55,7 +55,7 @@ export const Navbar = () => {
       <NextUINavbar
         maxWidth="full"
         position="sticky"
-        className="shadow-lg shadow-indigo-800/30 bg-[#03001417] backdrop-blur-md py-2 px-[122px] z-[800]"
+        className="shadow-lg shadow-indigo-800/30 bg-[#03001417] backdrop-blur-md py-2 px-0 phone:px-[16px] sm:px-[56px] lg:px-[122px] z-[800]"
       >
         <NavbarContent className="sm:flex hidden" justify="start">
           <NavbarBrand as="li" className="gap-3 max-w-fit">
@@ -106,7 +106,7 @@ export const Navbar = () => {
           </Link>
         </NavbarContent>
 
-        <NavbarMenu className="z-[990]">
+        <NavbarMenu className="z-[800]">
           <div className="mx-4 mt-10 flex flex-col gap-2">
             {links.map((item, index) => (
               <NavbarMenuItem key={`${item}-${index}`}>

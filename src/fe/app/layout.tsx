@@ -4,6 +4,7 @@ import { Sora, Spline_Sans } from "next/font/google";
 import Providers from "@/providers/provider-ui";
 import { Navbar } from "@/components/navbar";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import ToasterProvider from "@/providers/toaster-provider";
 
 const sora = Sora({
   subsets: ["latin"],
@@ -31,10 +32,11 @@ export default function RootLayout({
     <html lang="en" className={`${sora.variable} ${splineSans.variable}`}>
       <head />
       <body className={`bg-[url('/site-bg.svg')] bg-cover relative  min-h-fit scroll-smooth`}>
-        <ScrollArea className="h-screen w-screen z-[990]">
+        <ToasterProvider />
+        <ScrollArea className="h-screen w-screen">
           <Providers>
             <Navbar />
-            <main className="px-[146px] relative">{children}</main>
+            <main className="px-[20px] phone:px-[40px] sm:px-[80px] lg:px-[146px] relative">{children}</main>
           </Providers>
         </ScrollArea>
       </body>
