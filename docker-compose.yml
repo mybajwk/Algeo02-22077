@@ -4,7 +4,7 @@ services:
   api-service:
     build:
       dockerfile: Dockerfile
-      context: ./api
+      context: ./src/api
       target: prod
     container_name: api-service
     hostname: api-service
