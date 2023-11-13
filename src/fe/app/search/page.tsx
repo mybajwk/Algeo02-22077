@@ -2,7 +2,7 @@
 
 import FileUpload from "@/components/file-upload";
 import ModalUpload from "@/components/modal-upload";
-import ResultContainer from "@/components/result-container";
+import ResultContainer, { ImagesData } from "@/components/result-container";
 import Transition from "@/components/transition";
 import { convertFileToBase64 } from "@/lib/libs";
 import {
@@ -15,15 +15,11 @@ import {
   Tabs,
   cn,
 } from "@nextui-org/react";
+import { v4 } from "uuid";
 import { AnimatePresence, motion } from "framer-motion";
 import { Trash2 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { Key, useEffect, useState } from "react";
 import toast from "react-hot-toast";
-
-interface ImagesData {
-  url: string;
-  similarity: string;
-}
 
 const paginationAnimationVariant = {
   next: {
@@ -37,14 +33,14 @@ const paginationAnimationVariant = {
 };
 
 const SearchPage = () => {
-  const urls = ["a", "b", "c", "d", "e", "f", "g", "h"];
-  const urls2 = ["1", "2", "3", "4", "5", "6", "7", "8"];
   const [photo, setPhoto] = useState<File | null>(null);
   const [urlImg, setUrlImg] = useState<string>("");
   const [open, setOpen] = useState(false);
-  const [imagesData, setImagesData] = useState<string[]>(urls);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [paginationStatus, setPaginationStatus] = useState("");
+  const [imagesData, setImagesData] = useState<ImagesData[]>([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPage, setTotalPage] = useState(0);
+  const [searchType, setSearchType] = useState<Key>("color");
+  const [tokenVisumatch, setTokenVisumatch] = useState("");
   const handleOnDelete = () => {
     setPhoto(null);
     setUrlImg("");
@@ -62,11 +58,48 @@ const SearchPage = () => {
   }, [photo]);
 
   const handleOnSubmit = async () => {
+    setCurrentPage((prev) => prev * 0 + 1);
     try {
       if (photo) {
+        let token = window.sessionStorage.getItem("token-visumatch");
+        if (!token) {
+          token = `${v4()}`.replaceAll("-", "");
+          window.sessionStorage.setItem("token-visumatch", token);
+        }
+
+        setTokenVisumatch(token);
+
         const base64File = await convertFileToBase64(photo);
 
         //fetch API
+        const response = await fetch(
+          `http://localhost:7780/image/${searchType}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              token: token,
+              captcha: "dhaehanadeaoe",
+              image: base64File,
+            }),
+          }
+        );
+
+        const resBody = await response.json();
+
+        if (!response.ok) {
+          throw new Error(resBody.message);
+        }
+
+        setTotalPage(resBody.page);
+
+        if (resBody.data) {
+          setImagesData([...resBody.data]);
+        } else {
+          setImagesData([]);
+        }
 
         toast.success("photo uploaded succesfull");
       }
@@ -77,24 +110,39 @@ const SearchPage = () => {
 
   const handlePaginatiOnChange = async (page: number) => {
     try {
-      // const response = await fetch("");
-
-      // const bodyRes = await response.json();
-
-      // if (!response.ok) {
-      // } else {
-      //   setImagesData([]);
-      // }
-      if (page > currentPage) {
-        setPaginationStatus("next");
-      } else if (page < currentPage) {
-        setPaginationStatus("prev");
-      }
       setCurrentPage(page);
-      if (page === 2) setImagesData([...urls2]);
-      if (page === 1) setImagesData([...urls]);
+      let token = window.sessionStorage.getItem("token-visumatch");
+      if (!token) {
+        token = `${v4()}${v4()}`.replaceAll("-", "");
+        window.sessionStorage.setItem("token-visumatch", token);
+      }
+      setTokenVisumatch(token);
+
+      const response = await fetch(`http://localhost:7780/image/page/${page}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token: token,
+        }),
+      });
+
+      const resBody = await response.json();
+
+      if (!response.ok) {
+        throw new Error(resBody.message);
+      }
+      if (resBody.data) {
+        setImagesData([...resBody.data]);
+      } else {
+        setImagesData([]);
+      }
     } catch (error) {
-      if (error instanceof Error) toast.error(error.message);
+      if (error instanceof Error) {
+        console.log(error);
+        toast.error(error.message);
+      }
     }
   };
 
@@ -160,6 +208,8 @@ const SearchPage = () => {
               <div className="w-full h-fit flex flex-col justify-center items-end gap-2">
                 <div className="flex flex-col sm:flex-row w-full gap-2 items-center">
                   <Tabs
+                    onSelectionChange={setSearchType}
+                    selectedKey={searchType}
                     size="md"
                     aria-label="Options"
                     radius="md"
@@ -248,43 +298,55 @@ const SearchPage = () => {
                 <p className="text-base md:text-md">Executed Time 13.5s</p>
               </div>
             </div>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentPage}
-                className="h-full w-full flex justify-center items-center overflow-hidden"
-                exit={paginationStatus === "next" ? "prev" : "next"}
-                initial={paginationStatus === "next" ? "prev" : "next"}
-                animate={{ opacity: 100, translateX: "0%" }}
-                transition={{ ease: "easeInOut", delay: 0.1, duration: 0.4 }}
-                variants={paginationAnimationVariant}
-              >
-                <ResultContainer urls={imagesData} />
-              </motion.div>
-            </AnimatePresence>
-            <Pagination
-              size="md"
-              onChange={handlePaginatiOnChange}
-              showControls
-              total={10}
-              initialPage={1}
-              classNames={{
-                cursor:
-                  "bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%",
-                base: "md:flex hidden",
-              }}
-            />
-            <Pagination
-              size="sm"
-              onChange={handlePaginatiOnChange}
-              showControls
-              total={10}
-              initialPage={1}
-              classNames={{
-                cursor:
-                  "bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%",
-                base: "flex md:hidden",
-              }}
-            />
+            <div className="min-h-[650px] w-full flex flex-col gap-3 justify-end items-center">
+              <>
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentPage}
+                    className="h-full w-full flex justify-center items-center overflow-hidden"
+                    exit={{ opacity: 0 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 100 }}
+                    transition={{
+                      ease: "easeInOut",
+                      delay: 0.1,
+                      duration: 0.4,
+                    }}
+                  >
+                    <ResultContainer urls={imagesData} token={tokenVisumatch} />
+                  </motion.div>
+                </AnimatePresence>
+              </>
+
+              <div className="w-full flex justify-center items-center">
+                <Pagination
+                  isDisabled={imagesData ? imagesData.length === 0 : true}
+                  size="md"
+                  onChange={handlePaginatiOnChange}
+                  showControls
+                  total={totalPage}
+                  initialPage={1}
+                  classNames={{
+                    cursor:
+                      "bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%",
+                    base: "md:flex hidden",
+                  }}
+                />
+                <Pagination
+                  isDisabled={imagesData ? imagesData.length === 0 : true}
+                  size="sm"
+                  onChange={handlePaginatiOnChange}
+                  showControls
+                  total={totalPage}
+                  initialPage={1}
+                  classNames={{
+                    cursor:
+                      "bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%",
+                    base: "flex md:hidden",
+                  }}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </AnimatePresence>

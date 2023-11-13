@@ -2,25 +2,25 @@ package controller
 
 import (
 	"algeo02/schema"
-	"net/http"
-	"strconv"
-	"os"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"os"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator"
 	"github.com/rs/zerolog/log"
 )
 
-func Pagination (context *gin.Context) {
+func Pagination(context *gin.Context) {
 	// data/:token/:name_file.png
 	// data/:token/result.json
 	var input schema.PaginationBodyRequest
 
 	// get page
-	page, err:= strconv.Atoi(context.Param("page"))
-	if err != nil{
+	page, err := strconv.Atoi(context.Param("page"))
+	if err != nil {
 		log.Err(err).Msg("Error conversion page")
 	}
 
@@ -37,7 +37,7 @@ func Pagination (context *gin.Context) {
 	}
 
 	// read from file
-	file, err := os.Open("data/"+input.Token+"/result.json")
+	file, err := os.Open("data/" + input.Token + "/result.json")
 	if err != nil {
 		fmt.Println("Error opening file:", err)
 		return

@@ -1,5 +1,4 @@
 import JSZip from "jszip";
-import { buffer } from "stream/consumers";
 
 export async function getAllFileEntries(
   dataTransferItemList: DataTransferItemList
@@ -52,8 +51,8 @@ export async function zipFilesUrl(images: File[]): Promise<string> {
   var zip = new JSZip();
 
   for (let i = 0; i < images.length; i++) {
-    const buffer = await convertFileToBase64(images[i])
-    zip.file(`${images[i].name}`, buffer, { base64: true });
+    const buffer = await images[i].arrayBuffer();
+    zip.file(`${images[i].name}`, buffer );
   }
 
   const archive = await zip.generateAsync({ type: "blob" });
@@ -62,15 +61,14 @@ export async function zipFilesUrl(images: File[]): Promise<string> {
 }
 
 export async function zipFilesBase64(images: File[]): Promise<string> {
-  var zip = new JSZip();
-
-  for (let i = 0; i < images.length; i++) {
-    const buffer = await convertFileToBase64(images[i]) 
-    zip.file(`${images[i].name}`, buffer, { base64: true });
-  }
+  const zip = new JSZip();
+  const promises = images.map(async (image) => {
+    const buffer = await image.arrayBuffer();
+    zip.file(`${image.name}`, buffer);
+  });
+  await Promise.all(promises);
 
   const archive = await zip.generateAsync({ type: "base64" });
-
   return archive;
 }
 

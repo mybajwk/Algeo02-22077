@@ -1,15 +1,19 @@
-import { Image, Skeleton } from "@nextui-org/react";
 import React, { FC } from "react";
 import ImageCard from "./image-card";
 
+export interface ImagesData {
+  name: string,
+  similarity: number
+}
 interface ResultContainerProps {
-  urls?: string[];
+  urls?: ImagesData[];
+  token: string
 }
 
-const ResultContainer: FC<ResultContainerProps> = ({ urls }) => {
+const ResultContainer: FC<ResultContainerProps> = ({ urls, token }) => {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-      {urls?.map((url) => <ImageCard key={url} />)}
+    <div className="min-h-[530px] grid grid-cols-2 md:grid-cols-4 gap-3">
+      {urls?.map((data) => <ImageCard key={data.name} url={data.name} similarity={data.similarity} token={token}/>)}
     </div>
   );
 };

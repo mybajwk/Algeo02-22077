@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
 import { Image as ImageData } from "@/components/file-upload-files";
 import { convertFileToBase64, zipFilesBase64, zipFilesUrl } from "@/lib/libs";
 import toast from "react-hot-toast";
+import { v4 } from "uuid";
 
 interface ModalUploadProps {
   open: boolean;
@@ -44,6 +45,12 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open }) => {
   const handleClick = async () => {
     try {
       setLoading(true);
+      let token = window.sessionStorage.getItem("token-visumatch");
+      if (!token) {
+        token = `${v4()}`.replaceAll("-", "");
+        window.sessionStorage.setItem("token-visumatch", token);
+      }
+
       let zipBase64;
       if (images.length > 0) {
         if (framer.selectedTab.label !== "Zip") {
@@ -55,21 +62,56 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open }) => {
           zipBase64 = await convertFileToBase64(images[0].file);
         }
       }
-      console.log(zipBase64);
 
       //fetch API
+      const [responseColor, responseTexture] = await Promise.all([
+        fetch("http://localhost:7780/image/upload-color", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            token: token,
+            captcha: "dhaehanadeaoe",
+            image: zipBase64,
+          }),
+        }),
+        fetch("http://localhost:7780/image/upload-texture", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            token: token,
+            captcha: "dhaehanadeaoe",
+            image: zipBase64,
+          }),
+        }),
+      ]);
+
+      const resBodyColor = await responseColor.json();
+      const resBodyTexture = await responseTexture.json();
+
+      if (!responseColor.ok) {
+        throw new Error(resBodyColor.message);
+      }
+
+      if (!responseTexture.ok) {
+        throw new Error(resBodyTexture.message);
+      }
 
       onOpenChange(false);
       setLoading(false);
 
       toast.success("dataset uploaded succesfull");
     } catch (error) {
-      if (error instanceof Error)
-      toast.error(error.message);
+      if (error instanceof Error) {
+        toast.error(error.message);
+        console.log(error.message);
+      }
     }
   };
 
-  useEffect(() => {}, images);
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
