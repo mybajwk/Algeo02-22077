@@ -37,8 +37,8 @@ const SearchPage = () => {
   const [urlImg, setUrlImg] = useState<string>("");
   const [open, setOpen] = useState(false);
   const [imagesData, setImagesData] = useState<ImagesData[]>([]);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [totalPage, setTotalPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
   const [searchType, setSearchType] = useState<Key>("color");
   const [tokenVisumatch, setTokenVisumatch] = useState("");
   const handleOnDelete = () => {
@@ -58,7 +58,7 @@ const SearchPage = () => {
   }, [photo]);
 
   const handleOnSubmit = async () => {
-    setCurrentPage((prev) => prev * 0 + 1);
+    setCurrentPage(1);
     try {
       if (photo) {
         let token = window.sessionStorage.getItem("token-visumatch");
@@ -309,8 +309,8 @@ const SearchPage = () => {
                     animate={{ opacity: 100 }}
                     transition={{
                       ease: "easeInOut",
-                      delay: 0.1,
-                      duration: 0.4,
+                      delay: 0.0,
+                      duration: 0.3,
                     }}
                   >
                     <ResultContainer urls={imagesData} token={tokenVisumatch} />
@@ -320,12 +320,12 @@ const SearchPage = () => {
 
               <div className="w-full flex justify-center items-center">
                 <Pagination
+                  page={currentPage}
                   isDisabled={imagesData ? imagesData.length === 0 : true}
                   size="md"
                   onChange={handlePaginatiOnChange}
                   showControls
                   total={totalPage}
-                  initialPage={1}
                   classNames={{
                     cursor:
                       "bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%",
@@ -333,12 +333,12 @@ const SearchPage = () => {
                   }}
                 />
                 <Pagination
+                  page={currentPage}
                   isDisabled={imagesData ? imagesData.length === 0 : true}
                   size="sm"
                   onChange={handlePaginatiOnChange}
                   showControls
                   total={totalPage}
-                  initialPage={1}
                   classNames={{
                     cursor:
                       "bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%",

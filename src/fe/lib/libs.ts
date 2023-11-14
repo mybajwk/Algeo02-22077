@@ -92,3 +92,4 @@ export function convertFileToBase64(file: Blob): Promise<string> {
     reader.readAsDataURL(file);
   });
 }
+

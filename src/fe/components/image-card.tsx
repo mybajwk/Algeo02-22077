@@ -3,7 +3,7 @@
 import { Button, Image, Skeleton } from "@nextui-org/react";
 import { Download } from "lucide-react";
 import { saveAs } from "file-saver";
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useState } from "react";
 
 interface ImageCardProps {
   url: string;
@@ -16,7 +16,7 @@ const ImageCard: FC<ImageCardProps> = ({ url, token, similarity }) => {
   const handleDownload = () => {
     saveAs(
       `http://localhost:7780/media/${token}/${url}.png`,
-      `similarity${(similarity * 100).toFixed(2)}%`.replace(".", ",")
+      `similarity${(similarity * 100).toFixed(2)}%`.replace(".", ",") + ".png"
     );
   };
 
@@ -28,7 +28,6 @@ const ImageCard: FC<ImageCardProps> = ({ url, token, similarity }) => {
     setLoading(false);
   };
 
-  
   return (
     <div className="relative overflow-hidden group h-fit flex justify-center items-center">
       <div className="absolute w-full h-full group-hover:bg-black/50 z-[80] transition transform"></div>

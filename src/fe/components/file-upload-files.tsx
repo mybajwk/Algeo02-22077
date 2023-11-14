@@ -18,7 +18,6 @@ import { Button, Divider, cn } from "@nextui-org/react";
 import { twMerge } from "tailwind-merge";
 import { ScrollArea } from "./ui/scroll-area";
 import { getAllFileEntries, getFile } from "@/lib/libs";
-import { waveform } from "ldrs";
 
 interface FileUploadFilesProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -65,7 +64,6 @@ const zipValidation = z
 
 const FileUploadFiles = forwardRef<HTMLInputElement, FileUploadFilesProps>(
   ({ setState, onChange, typeFile = "zip", type = "file", ...props }, ref) => {
-    waveform.register();
     const inputRef = useRef<HTMLInputElement>(null);
     const [images, setImages] = useState<Image[]>([]);
     const [indexRetry, setIndexRetry] = useState(-1);
@@ -121,7 +119,7 @@ const FileUploadFiles = forwardRef<HTMLInputElement, FileUploadFilesProps>(
       } else {
         if (e.dataTransfer.files) {
           setLoading(true);
-          
+
           for (let i = 0; i < e.dataTransfer.files.length; i++) {
             let validate;
             if (typeFile === "files") {
@@ -325,9 +323,7 @@ const FileUploadFiles = forwardRef<HTMLInputElement, FileUploadFilesProps>(
               "w-full h-full justify-center items-center text-white",
               loading ? "flex" : "hidden"
             )}
-          >
-            <l-waveform color="white"></l-waveform>
-          </div>
+          ></div>
           <FileItems
             images={images}
             handleDelete={handleDelete}
@@ -378,7 +374,7 @@ const FileItem: React.FC<FileItemProps> = ({
             {image.file.name}
           </p>
           <p
-            className={twMerge(
+            className={cn(
               "hyphens-auto font-montserrat text-[11px] leading-[14px] sm:text-xs",
               image.error ? "text-ted-red" : "text-[#1CCA00]"
             )}
