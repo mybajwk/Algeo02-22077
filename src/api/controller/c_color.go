@@ -116,7 +116,7 @@ func CheckColor(context *gin.Context) {
 		}
 		temp /= float64(block*block + 4)
 		if temp > 0.6 {
-			if len(result[idx]) == 6 {
+			if len(result[idx]) == 8 {
 				idx++
 			}
 			res := schema.Result{
@@ -144,7 +144,7 @@ func CheckColor(context *gin.Context) {
 		fmt.Println("Error encoding data to JSON:", err)
 	}
 
-	context.JSON(http.StatusOK, gin.H{"success": true, "page": idx, "data": result})
+	context.JSON(http.StatusOK, gin.H{"success": true, "page": idx, "data": result[1]})
 	log.Info().Msg("Yey Success")
 }
 func UploadDataSetColor(context *gin.Context) {
