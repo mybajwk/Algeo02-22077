@@ -13,6 +13,7 @@ import (
 	"math"
 	"net/http"
 	"os"
+	"sort"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -187,6 +188,7 @@ func CheckTexture(context *gin.Context) {
 	}
 
 	idx = 1
+	var tempData []schema.Result
 	result := make(map[int][]schema.Result)
 	for key, val := range data {
 		temp := 0.0
@@ -195,16 +197,28 @@ func CheckTexture(context *gin.Context) {
 		}
 		temp /= 16
 		if temp > 0.6 {
-			if len(result[idx]) == 8 {
-				idx++
-			}
+
 			res := schema.Result{
 				Name:       key,
 				Similarity: temp,
 			}
-			result[idx] = append(result[idx], res)
+			tempData = append(tempData, res)
 		}
 	}
+	sort.Slice(tempData, func(i, j int) bool {
+		return tempData[i].Similarity > tempData[j].Similarity
+	})
+	idx = 1
+	for _, val := range tempData {
+
+		if val.Similarity > 0.6 {
+			if len(result[idx]) == 8 {
+				idx++
+			}
+			result[idx] = append(result[idx], val)
+		}
+	}
+
 	filePath := "data/" + input.Token + "/result.json"
 
 	// Open a file for writing

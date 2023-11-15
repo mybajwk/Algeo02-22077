@@ -12,7 +12,6 @@ import (
 	_ "image/jpeg"
 	"image/png"
 	"os"
-	"sort"
 	"sync"
 
 	"net/http"
@@ -22,145 +21,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func CheckColor(context *gin.Context) {
-
-	var input schema.CheckImageBodyRequest
-
-	if err := context.ShouldBindJSON(&input); err != nil {
-		log.Err(err).Msg("Error Bind JSON")
-		context.JSON(http.StatusOK, gin.H{"success": false, "message": "Error Bind JSON"})
-		return
-	}
-	validator := validator.New()
-	if err := validator.Struct(input); err != nil {
-		log.Err(err).Msg("Error Validator")
-		context.JSON(http.StatusOK, gin.H{"success": false, "message": "Error Validator"})
-		return
-	}
-
-	imageData, err := base64.StdEncoding.DecodeString(input.Image)
-	if err != nil {
-		log.Err(err).Msg("Error Decode Base64")
-		return
-	}
-
-	// Create a reader from the image data
-	imageReader := bytes.NewReader(imageData)
-	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
-
-	// Decode the image into an image.Image
-	img, _, err := image.Decode(imageReader)
-	if err != nil {
-		log.Err(err).Msg("Error Decode Image")
-		return
-	}
-
-	bounds := img.Bounds()
-	width, height := bounds.Max.X, bounds.Max.Y
-	block := 4
-	h := make([]int, block+1)
-	w := make([]int, block+1)
-	for i := 0; i <= block; i++ {
-		h[i] = height * i / block
-		w[i] = width * i / block
-	}
-	rgbMatrix := make([][]schema.HSV, block*block)
-	idx := 0
-
-	for i := 0; i < block; i++ {
-		for j := 0; j < block; j++ {
-			temp := 0
-			rgbMatrix[idx] = make([]schema.HSV, (h[i+1]-h[i])*(w[j+1]-w[j]))
-			print(rgbMatrix[i][0].H)
-			for y := 0; y < h[i+1]-h[i]; y++ {
-				for x := 0; x < w[j+1]-w[j]; x++ {
-					r, g, b, _ := img.At(x+w[j], y+h[i]).RGBA()
-					rgbMatrix[idx][temp] = utilities.ConvertRGBToHSV(r, g, b)
-					temp++
-
-				}
-			}
-			idx++
-		}
-	}
-
-	hist := make([][]int, block*block)
-	for i := 0; i < block*block; i++ {
-		hist[i] = utilities.GetVector(rgbMatrix[i])
-	}
-
-	// read from json
-	file, err := os.Open("data/" + input.Token + "/data_color.json")
-	if err != nil {
-		fmt.Println("Error opening file:", err)
-		return
-	}
-	defer file.Close()
-
-	var data map[int][][]int
-
-	decoder := json.NewDecoder(file)
-	if err := decoder.Decode(&data); err != nil {
-		fmt.Println("Error decoding JSON:", err)
-		return
-	}
-	var tempData []schema.Result
-	result := make(map[int][]schema.Result)
-	for key, val := range data {
-		temp := 0.0
-		for i, value := range val {
-			temp1 := utilities.CosineSimilarityColor(value, hist[i])
-			temp += temp1
-			if i == 5 || i == 6 || i == 9 || i == 10 {
-				temp += temp1
-			}
-		}
-		temp /= float64(block*block + 4)
-		if temp > 0.6 {
-
-			res := schema.Result{
-				Name:       key,
-				Similarity: temp,
-			}
-			// result[idx] = append(result[idx], res)
-			tempData = append(tempData, res)
-		}
-	}
-	sort.Slice(tempData, func(i, j int) bool {
-		return tempData[i].Similarity > tempData[j].Similarity
-	})
-	idx = 1
-	for _, val := range tempData {
-
-		if val.Similarity > 0.6 {
-			if len(result[idx]) == 8 {
-				idx++
-			}
-			result[idx] = append(result[idx], val)
-		}
-	}
-	filePath := "data/" + input.Token + "/result.json"
-
-	// Open a file for writing
-	fileResult, err := os.Create(filePath)
-	if err != nil {
-		fmt.Println("Error creating file:", err)
-		return
-	}
-	defer fileResult.Close()
-
-	// Create an encoder for JSON
-	encoder := json.NewEncoder(fileResult)
-
-	// Encode and write the data to the file
-	if err := encoder.Encode(result); err != nil {
-		fmt.Println("Error encoding data to JSON:", err)
-	}
-
-	context.JSON(http.StatusOK, gin.H{"success": true, "page": idx, "data": result[1]})
-	log.Info().Msg("Yey Success")
-}
-func UploadDataSetColor(context *gin.Context) {
+func UploadDataSetAll(context *gin.Context) {
 
 	var input schema.CheckImageBodyRequest
 
@@ -191,6 +52,8 @@ func UploadDataSetColor(context *gin.Context) {
 	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
 
 	vector := make(map[int][][]int)
+	vectorTexture := make(map[int][][]float64)
+
 	var wg sync.WaitGroup
 	var mu sync.Mutex
 	limit := make(chan struct{}, 130)
@@ -250,9 +113,36 @@ func UploadDataSetColor(context *gin.Context) {
 				hist[i] = utilities.GetVector(rgbMatrix[i])
 			}
 
+			// texture
+			idx = 0
+			grayImage := make([][][]uint8, block*block)
+			for i := 0; i < block; i++ {
+				for j := 0; j < block; j++ {
+					grayImage[idx] = make([][]uint8, h[i+1]-h[i])
+					for y := range grayImage[idx] {
+						grayImage[idx][y] = make([]uint8, w[j+1]-w[j])
+						for x := range grayImage[idx][y] {
+							originalColor := img.At(w[j]+x, h[i]+y)
+							r, g, b, _ := originalColor.RGBA()
+							gray := uint8(0.299*float64(r<<8) + 0.587*float64(g<<8) + 0.114*float64(b<<8))
+							grayImage[idx][y][x] = gray
+						}
+					}
+					idx++
+				}
+			}
+
+			matrix := make([][][]float64, block*block)
+			dataVector := make([][]float64, block*block)
+			for i := 0; i < temp; i++ {
+				matrix[i] = GetCoOccurrenceMatrix(grayImage[i])
+				dataVector[i] = GetCHE(matrix[i])
+			}
+
 			// Lock once to update the map
 			mu.Lock()
 			vector[i] = hist
+			vectorTexture[i] = dataVector
 			mu.Unlock()
 
 		}(file, i)
@@ -292,10 +182,12 @@ func UploadDataSetColor(context *gin.Context) {
 		}
 	}()
 	// Specify the file path and name
-	filePath := "data/" + input.Token + "/data_color.json"
+	filePathColor := "data/" + input.Token + "/data_color.json"
+	filePathTexture := "data/" + input.Token + "/data_texture.json"
 
 	// Open a file for writing
-	file, err := os.Create(filePath)
+	// color
+	file, err := os.Create(filePathColor)
 	if err != nil {
 		fmt.Println("Error creating file:", err)
 		return
@@ -309,5 +201,23 @@ func UploadDataSetColor(context *gin.Context) {
 	if err := encoder.Encode(vector); err != nil {
 		fmt.Println("Error encoding data to JSON:", err)
 	}
-	context.JSON(http.StatusOK, gin.H{"success": true, "dataas": vector[0]})
+
+	// texture
+
+	fileTexture, err := os.Create(filePathTexture)
+	if err != nil {
+		fmt.Println("Error creating fileTexture:", err)
+		return
+	}
+	defer fileTexture.Close()
+
+	// Create an encoder for JSON
+	encoderTexture := json.NewEncoder(fileTexture)
+
+	// Encode and write the data to the file
+	if err := encoderTexture.Encode(vectorTexture); err != nil {
+		fmt.Println("Error encoding data to JSON:", err)
+	}
+
+	context.JSON(http.StatusOK, gin.H{"success": true})
 }
