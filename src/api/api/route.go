@@ -28,7 +28,8 @@ func setupPublicRoute(router *gin.Engine) {
 	publicRoutes := router.Group("/image")
 
 	publicRoutes.POST("color", controller.CheckColor)
-	publicRoutes.POST("scrap", controller.ScrapingImage)
+	publicRoutes.POST("scrap-url", controller.ScrapingImageUrl)
+	publicRoutes.POST("scrap-text", controller.ScrapingImageText)
 	publicRoutes.POST("texture", controller.CheckTexture)
 	publicRoutes.POST("/page/:page", controller.Pagination)
 	publicRoutes.POST("/upload-color", controller.UploadDataSetColor)

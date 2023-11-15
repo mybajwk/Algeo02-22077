@@ -9,6 +9,7 @@ require (
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/gocolly/colly/v2 v2.1.0
 	github.com/rs/zerolog v1.31.0
+	github.com/serpapi/google-search-results-golang v0.0.0-20230616000151-95707d993dc6
 )
 
 require (
