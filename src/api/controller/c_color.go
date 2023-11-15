@@ -259,6 +259,12 @@ func UploadDataSetColor(context *gin.Context) {
 	}
 
 	wg.Wait()
+
+	err = os.RemoveAll("data/" + input.Token)
+	if err != nil {
+		log.Err(err).Msg("Error delete folder")
+
+	}
 	err = os.MkdirAll("data/"+input.Token, os.ModeDir)
 	if err != nil {
 		log.Err(err).Msg("Error create folder")

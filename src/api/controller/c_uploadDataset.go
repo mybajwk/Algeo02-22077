@@ -135,8 +135,8 @@ func UploadDataSetAll(context *gin.Context) {
 			matrix := make([][][]float64, block*block)
 			dataVector := make([][]float64, block*block)
 			for i := 0; i < temp; i++ {
-				matrix[i] = GetCoOccurrenceMatrix(grayImage[i])
-				dataVector[i] = GetCHE(matrix[i])
+				matrix[i] = utilities.GetCoOccurrenceMatrix(grayImage[i])
+				dataVector[i] = utilities.GetCHE(matrix[i])
 			}
 
 			// Lock once to update the map
@@ -149,6 +149,13 @@ func UploadDataSetAll(context *gin.Context) {
 	}
 
 	wg.Wait()
+
+	err = os.RemoveAll("data/" + input.Token)
+
+	if err != nil {
+		log.Err(err).Msg("Error delete folder")
+
+	}
 	err = os.MkdirAll("data/"+input.Token, os.ModeDir)
 	if err != nil {
 		log.Err(err).Msg("Error create folder")
