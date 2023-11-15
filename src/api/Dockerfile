@@ -26,6 +26,20 @@ COPY . /go/src/api
 RUN go build -o ./dist/api
 
 FROM alpine:3.16.6 as prod
+# Install Chromium and required dependencies
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    freetype-dev \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont
+
+# Set environment variables for Chromium
+ENV CHROME_BIN=/usr/bin/chromium-browser \
+    CHROME_PATH=/usr/lib/chromium/
+
 RUN apk add --update ca-certificates
 RUN apk add --no-cache tzdata && \
   cp -f /usr/share/zoneinfo/Asia/Jakarta /etc/localtime && \
@@ -38,6 +52,20 @@ ENTRYPOINT ["./api"]
 # ------------------------------------------------------------
 
 FROM alpine:3.16.6 as local
+# Install Chromium and required dependencies
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    freetype-dev \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont
+
+# Set environment variables for Chromium
+ENV CHROME_BIN=/usr/bin/chromium-browser \
+    CHROME_PATH=/usr/lib/chromium/
+
 RUN apk add --update ca-certificates
 RUN apk add --no-cache tzdata && \
   cp -f /usr/share/zoneinfo/Asia/Jakarta /etc/localtime && \
