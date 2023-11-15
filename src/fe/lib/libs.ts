@@ -1,4 +1,6 @@
+import UZIP from "uzip"
 import JSZip from "jszip";
+import fromEntries from "fromentries";
 
 export async function getAllFileEntries(
   dataTransferItemList: DataTransferItemList
@@ -47,12 +49,13 @@ async function readEntriesPromise(directoryReader: any) {
   }
 }
 
+
 export async function zipFilesUrl(images: File[]): Promise<string> {
   var zip = new JSZip();
 
   for (let i = 0; i < images.length; i++) {
-    const buffer = await images[i].arrayBuffer();
-    zip.file(`${images[i].name}`, buffer );
+    // const buffer = await images[i].arrayBuffer();
+    zip.file(`${images[i].name}`, images[i]);
   }
 
   const archive = await zip.generateAsync({ type: "blob" });
@@ -92,4 +95,3 @@ export function convertFileToBase64(file: Blob): Promise<string> {
     reader.readAsDataURL(file);
   });
 }
-

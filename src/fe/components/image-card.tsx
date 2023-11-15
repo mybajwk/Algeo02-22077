@@ -3,7 +3,7 @@
 import { Button, Image, Skeleton } from "@nextui-org/react";
 import { Download } from "lucide-react";
 import { saveAs } from "file-saver";
-import React, { FC, useState } from "react";
+import React, { FC, useRef, useState } from "react";
 
 interface ImageCardProps {
   url: string;
@@ -20,8 +20,15 @@ const ImageCard: FC<ImageCardProps> = ({ url, token, similarity }) => {
     );
   };
 
+  const refImage = useRef<HTMLImageElement>(null)
+
   const handleImageError = () => {
     setLoading(true);
+  //   const refreshInterval = setInterval(() => {
+  //     const newSrc = url
+  //     if (refImage.current) refImage.current.src = newSrc; // Change the image src to force a refresh
+
+  // }, 3000);
   };
 
   const handleImageLoad = () => {
@@ -52,6 +59,7 @@ const ImageCard: FC<ImageCardProps> = ({ url, token, similarity }) => {
 
       <div className="w-[300px] h-[250px] relative rounded-xl overflow-hidden">
         <Image
+          ref={refImage}
           className="w-full h-full object-cover"
           removeWrapper
           alt="NextUI hero Image with delay"

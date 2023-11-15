@@ -1,15 +1,16 @@
 "use client";
 
-import { Button, image } from "@nextui-org/react";
-import { FC, Key, useEffect, useState } from "react";
-import FileUploadFiles, { allowedFileTypes } from "./file-upload-files";
+import { Button } from "@nextui-org/react";
+import { FC, useState } from "react";
+import FileUploadFiles from "./file-upload-files";
 import { useTabs } from "@/hooks/use-tabs";
 import { Framer } from "@/components/framer";
 import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
 import { Image as ImageData } from "@/components/file-upload-files";
-import { convertFileToBase64, zipFilesBase64, zipFilesUrl } from "@/lib/libs";
+import { convertFileToBase64, zipFilesBase64 } from "@/lib/libs";
 import toast from "react-hot-toast";
 import { v4 } from "uuid";
+import Scrapping from "./scrapping-component";
 
 interface ModalUploadProps {
   open: boolean;
@@ -18,7 +19,9 @@ interface ModalUploadProps {
 
 const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open }) => {
   const [images, setImages] = useState<ImageData[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [webUrl, setWebUrl] = useState<string>("");
+  const [errorWS, setErrorWS] = useState<string>("");
 
   const [hookProps] = useState({
     tabs: [
@@ -37,6 +40,11 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open }) => {
         children: <></>,
         id: "activity",
       },
+      {
+        label: "Web Scrapping",
+        children: <></>,
+        id: "scrapping",
+      },
     ],
     initialTabId: "Matches",
   });
@@ -51,59 +59,87 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open }) => {
         window.sessionStorage.setItem("token-visumatch", token);
       }
 
-      let zipBase64;
-      if (images.length > 0) {
-        if (framer.selectedTab.label !== "Zip") {
-          const files = images
-            .filter((img) => !img.error)
-            .map((img) => img.file);
-          zipBase64 = await zipFilesBase64(files);
-        } else {
-          zipBase64 = await convertFileToBase64(images[0].file);
+      if (framer.selectedTab.label !== "Web Scrapping") {
+        let zipBase64;
+        if (images.length > 0) {
+          if (framer.selectedTab.label !== "Zip") {
+            const files = images
+              .filter((img) => !img.error)
+              .map((img) => img.file);
+            zipBase64 = await zipFilesBase64(files);
+          } else {
+            zipBase64 = await convertFileToBase64(images[0].file);
+          }
         }
-      }
 
-      //fetch API
-      const [responseColor, responseTexture] = await Promise.all([
-        fetch("http://localhost:7780/image/upload-color", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            token: token,
-            captcha: "dhaehanadeaoe",
-            image: zipBase64,
+        //fetch API
+        const [responseColor, responseTexture] = await Promise.all([
+          fetch("http://localhost:7780/image/upload-color", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              token: token,
+              captcha: "dhaehanadeaoe",
+              image: zipBase64,
+            }),
           }),
-        }),
-        fetch("http://localhost:7780/image/upload-texture", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            token: token,
-            captcha: "dhaehanadeaoe",
-            image: zipBase64,
+          fetch("http://localhost:7780/image/upload-texture", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              token: token,
+              captcha: "dhaehanadeaoe",
+              image: zipBase64,
+            }),
           }),
-        }),
-      ]);
+        ]);
 
-      const resBodyColor = await responseColor.json();
-      const resBodyTexture = await responseTexture.json();
+        const resBodyColor = await responseColor.json();
+        const resBodyTexture = await responseTexture.json();
 
-      if (!responseColor.ok) {
-        throw new Error(resBodyColor.message);
-      }
+        if (!responseColor.ok) {
+          throw new Error(resBodyColor.message);
+        }
 
-      if (!responseTexture.ok) {
-        throw new Error(resBodyTexture.message);
+        if (!responseTexture.ok) {
+          throw new Error(resBodyTexture.message);
+        }
+        toast.success("dataset uploaded succesfull");
+      } else {
+        if (!webUrl) {
+          setErrorWS("Web url harus diisi tidak boleh kosong");
+          return;
+        }
+        const response = await fetch(
+          "http://localhost:7780/image/web-scrapping",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              token: token,
+              captcha: "dhaehanadeaoe",
+              url: webUrl,
+            }),
+          }
+        );
+
+        const resBody = await response.json();
+
+        if (!response.ok) {
+          throw new Error(resBody.message);
+        }
+
+        toast.success("web url for scrapping submited");
       }
 
       onOpenChange(false);
       setLoading(false);
-
-      toast.success("dataset uploaded succesfull");
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
@@ -130,11 +166,17 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open }) => {
                   typeFile="folder"
                   setState={setImages}
                 />
-              ) : (
+              ) : framer.selectedTab.label === "Files" ? (
                 <FileUploadFiles
                   key="files"
                   typeFile="files"
                   setState={setImages}
+                />
+              ) : (
+                <Scrapping
+                  webUrl={webUrl}
+                  setWebUrl={setWebUrl}
+                  error={errorWS}
                 />
               )}
             </div>
