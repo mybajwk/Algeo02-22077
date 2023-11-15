@@ -206,7 +206,7 @@ func CheckTexture(context *gin.Context) {
 		}
 	}
 	sort.Slice(tempData, func(i, j int) bool {
-		return tempData[i].Similarity < tempData[j].Similarity
+		return tempData[i].Similarity > tempData[j].Similarity
 	})
 	idx = 1
 	for _, val := range tempData {
