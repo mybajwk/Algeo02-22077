@@ -10,6 +10,10 @@ import {
   Button,
   NavbarItem,
   cn,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
 } from "@nextui-org/react";
 
 import Link from "next/link";
@@ -27,11 +31,7 @@ export const Navbar = () => {
       href: "/",
       active: pathName === "/",
     },
-    {
-      label: "Search",
-      href: "/search",
-      active: pathName === "/search",
-    },
+
     {
       label: "Description",
       href: "/desc",
@@ -43,6 +43,22 @@ export const Navbar = () => {
       active: pathName === "/about",
     },
   ];
+
+  const linkSearch = {
+    label: "Search",
+    href: "/search",
+    active: pathName.startsWith("/search"),
+    subLinks: [
+      {
+        label: "default",
+        href: "/search",
+      },
+      {
+        label: "camera",
+        href: "/search/camera",
+      },
+    ],
+  };
   useEffect(() => {
     setRedirect("");
   }, [pathName]);
@@ -86,6 +102,42 @@ export const Navbar = () => {
               </p>
             </NavbarItem>
           ))}
+          <Dropdown classNames={{ content: "bg-blue-800/80 text-slate-400" }}>
+            <DropdownTrigger>
+              <p
+                className={cn(
+                  "cursor-pointer font-sans pb-2 hover:text-white relative w-fit block after:block after:content-[''] after:absolute after:h-[2px] after:bg-white after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-500 after:origin-left",
+                  linkSearch.active
+                    ? "text-white after:scale-x-100"
+                    : "text-slate-500"
+                )}
+              >
+                {linkSearch.label}
+              </p>
+            </DropdownTrigger>
+            <DropdownMenu
+              aria-label="Link Actions"
+              itemClasses={{
+                base: "data-[hover=true]:bg-indigo-900 data-[hover=true]:text-white",
+              }}
+            >
+              {linkSearch.subLinks.map((link) => (
+                <DropdownItem key={link.href}>
+                  <p
+                    onClick={() => {
+                      setRedirect("yes");
+                      setTimeout(() => {
+                        router.push(link.href);
+                        if (pathName === link.href) setRedirect("");
+                      }, 1000);
+                    }}
+                  >
+                    {link.label}
+                  </p>
+                </DropdownItem>
+              ))}
+            </DropdownMenu>
+          </Dropdown>
         </NavbarContent>
 
         <NavbarContent className="sm:hidden flex" justify="start">
@@ -101,7 +153,12 @@ export const Navbar = () => {
         </NavbarContent>
 
         <NavbarContent className="" justify="end">
-          <Link href="https://github.com/mybajwk/Algeo02-22077" className="text-white hover:text-slate-400" rel="noopener noreferrer" target="_blank">
+          <Link
+            href="https://github.com/mybajwk/Algeo02-22077"
+            className="text-white hover:text-slate-400"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
             <AiFillGithub size={30} />
           </Link>
         </NavbarContent>

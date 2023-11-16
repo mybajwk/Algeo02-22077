@@ -227,7 +227,6 @@ const FileUploadFiles = forwardRef<HTMLInputElement, FileUploadFilesProps>(
     const otherAtt = { directory: "", webkitdirectory: "" };
 
     useEffect(() => {
-      console.log(loading);
     }, [loading]);
 
     return (

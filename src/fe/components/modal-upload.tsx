@@ -1,24 +1,29 @@
 "use client";
 
-import { Button, image } from "@nextui-org/react";
-import { FC, Key, useEffect, useState } from "react";
-import FileUploadFiles, { allowedFileTypes } from "./file-upload-files";
+import { Button } from "@nextui-org/react";
+import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
+import FileUploadFiles from "./file-upload-files";
 import { useTabs } from "@/hooks/use-tabs";
 import { Framer } from "@/components/framer";
 import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
 import { Image as ImageData } from "@/components/file-upload-files";
-import { convertFileToBase64, zipFilesBase64, zipFilesUrl } from "@/lib/libs";
+import { convertFileToBase64, zipFilesBase64 } from "@/lib/libs";
 import toast from "react-hot-toast";
 import { v4 } from "uuid";
+import Scrapping from "@/components/scrapping-component";
 
 interface ModalUploadProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  setTime: Dispatch<SetStateAction<number>>
 }
 
-const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open }) => {
+const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open, setTime }) => {
   const [images, setImages] = useState<ImageData[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [input, setInput] = useState<string>("");
+  const [type, setType] = useState<string>("url");
+  const [errorWS, setErrorWS] = useState<string>("");
 
   const [hookProps] = useState({
     tabs: [
@@ -37,12 +42,22 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open }) => {
         children: <></>,
         id: "activity",
       },
+      {
+        label: "Image Scrapping",
+        children: <></>,
+        id: "scrapping",
+      },
     ],
     initialTabId: "Matches",
   });
   const framer = useTabs(hookProps);
 
+  useEffect(() => {
+    if (input) setErrorWS("")
+  }, [input])
+
   const handleClick = async () => {
+    const timeStart = performance.now()
     try {
       setLoading(true);
       let token = window.sessionStorage.getItem("token-visumatch");
@@ -51,21 +66,20 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open }) => {
         window.sessionStorage.setItem("token-visumatch", token);
       }
 
-      let zipBase64;
-      if (images.length > 0) {
-        if (framer.selectedTab.label !== "Zip") {
-          const files = images
-            .filter((img) => !img.error)
-            .map((img) => img.file);
-          zipBase64 = await zipFilesBase64(files);
-        } else {
-          zipBase64 = await convertFileToBase64(images[0].file);
+      if (framer.selectedTab.label !== "Image Scrapping") {
+        let zipBase64;
+        if (images.length > 0) {
+          if (framer.selectedTab.label !== "Zip") {
+            const files = images
+              .filter((img) => !img.error)
+              .map((img) => img.file);
+            zipBase64 = await zipFilesBase64(files);
+          } else {
+            zipBase64 = await convertFileToBase64(images[0].file);
+          }
         }
-      }
 
-      //fetch API
-      const [responseColor, responseTexture] = await Promise.all([
-        fetch("http://localhost:7780/image/upload-color", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/image/upload-all`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -75,41 +89,99 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open }) => {
             captcha: "dhaehanadeaoe",
             image: zipBase64,
           }),
-        }),
-        fetch("http://localhost:7780/image/upload-texture", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            token: token,
-            captcha: "dhaehanadeaoe",
-            image: zipBase64,
-          }),
-        }),
-      ]);
+        });
 
-      const resBodyColor = await responseColor.json();
-      const resBodyTexture = await responseTexture.json();
+        const resBody = await response.json();
 
-      if (!responseColor.ok) {
-        throw new Error(resBodyColor.message);
+        if (!response.ok) {
+          throw new Error(resBody.message);
+        }
+
+        toast.success("dataset uploaded succesfull");
+        onOpenChange(false);
+        setLoading(false);
+        setErrorWS("")
+        setInput("")
+        setImages([])
+      } else {
+        if (!input) {
+          setErrorWS("Input harus diisi tidak boleh kosong");
+          setLoading(false)
+          return;
+        }
+
+        if (type === "url") {
+          const urlRegex: RegExp =
+            /^(https?:\/\/www\.|https?:\/\/|http:\/\/www\.|http:\/\/)?[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9]{2,})+(\.[a-zA-Z0-9]{2,})?$/i;
+
+          if (!urlRegex.test(input)) {
+            setErrorWS("URL web tidak valid");
+            setLoading(false)
+            return;
+          }
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/image/scrap-url`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                token: token,
+                captcha: "dhaehanadeaoe",
+                text: input,
+              }),
+            }
+          );
+
+          const resBody = await response.json();
+
+          if (!response.ok) {
+            throw new Error(resBody.message);
+          }
+        } else if (type === "text") {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/image/scrap-text`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                token: token,
+                captcha: "dhaehanadeaoe",
+                text: input,
+              }),
+            }
+          );
+
+          const resBody = await response.json();
+
+          if (!response.ok) {
+            throw new Error(resBody.message);
+          }
+        }
+
+        toast.success("data for scrapping submited");
+        onOpenChange(false);
+        setLoading(false);
+        setErrorWS("")
+        setInput("")
+        setImages([])
       }
-
-      if (!responseTexture.ok) {
-        throw new Error(resBodyTexture.message);
-      }
-
-      onOpenChange(false);
-      setLoading(false);
-
-      toast.success("dataset uploaded succesfull");
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
         console.log(error.message);
+        setLoading(false);
+        setErrorWS("")
+        setInput("")
+        setImages([])
       }
     }
+    const timeEnd = performance.now()
+    const time = (timeEnd - timeStart) /1000
+    setTime(time)
   };
 
   return (
@@ -130,11 +202,18 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open }) => {
                   typeFile="folder"
                   setState={setImages}
                 />
-              ) : (
+              ) : framer.selectedTab.label === "Files" ? (
                 <FileUploadFiles
                   key="files"
                   typeFile="files"
                   setState={setImages}
+                />
+              ) : (
+                <Scrapping
+                  input={input}
+                  setInput={setInput}
+                  error={errorWS}
+                  setType={setType}
                 />
               )}
             </div>
@@ -149,7 +228,7 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open }) => {
               Close
             </Button>
             <Button
-              isDisabled={images.length === 0}
+              isDisabled={images.length === 0 && !input}
               isLoading={loading}
               color="primary"
               onPress={handleClick}
