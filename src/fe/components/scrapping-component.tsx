@@ -36,7 +36,7 @@ const Scrapping: FC<ScrappingProps> = ({ input, setInput, error, setType }) => {
               errorMessage={error && error}
               color={error ? "danger" : "default"}
             />
-            <p className="font-spline text-sm pl-2">Contoh url: "https://example.com"</p>
+            <p className="font-spline text-sm pl-2">{'Contoh url: "https://example.com"'}</p>
           </div>
         </Tab>
         <Tab key="text" title="Text">

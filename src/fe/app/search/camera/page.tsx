@@ -182,6 +182,7 @@ const SearchCameraPage = () => {
   useEffect(() => {
     const intervalId = setInterval(capture, 10000);
     return () => clearInterval(intervalId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCameraOn]);
 
   const [facingMode, setFacingMode] = useState("user");
@@ -250,7 +251,7 @@ const SearchCameraPage = () => {
                   <Skeleton className="absolute w-full h-full z-[400]" />
                   <div className=" absolute flex justify-center gap-3 items-start font-sans my-auto mx-auto z-[500]">
                     <CameraOff className="w-5 h-5" />
-                    <p className="text-white">Camera doesn't start</p>
+                    <p className="text-white">{"Camera doesn't start"}</p>
                   </div>
                 </>
               )}

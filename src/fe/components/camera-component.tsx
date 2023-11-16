@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Webcam from "react-webcam";
+import Image from "next/image";
 
 const CameraComponent = () => {
   const webcamRef = useRef<any>(null);
-  const [capturedImage, setCapturedImage] = useState();
+  const [capturedImage, setCapturedImage] = useState<string>("");
   const [deviceId, setDeviceId] = useState<any>({});
   const [devices, setDevices] = useState<any[]>([]);
 
@@ -40,7 +41,7 @@ const CameraComponent = () => {
   return (
     <div>
       {devices.map((device, key) => (
-          <div>
+          <div key={device.deviceId}>
             <Webcam audio={false} videoConstraints={{ deviceId: device.deviceId }} />
             {device.label || `Device ${key + 1}`}
           </div>
@@ -48,7 +49,7 @@ const CameraComponent = () => {
         ))}
       <Webcam audio={false} ref={webcamRef} screenshotFormat="image/jpeg" />
       <div>
-        <img key={capturedImage} src={capturedImage} alt="image" />
+        <Image key={capturedImage} src={capturedImage} alt="image" />
       </div>
     </div>
   );
