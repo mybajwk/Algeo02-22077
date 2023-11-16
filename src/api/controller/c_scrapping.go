@@ -50,48 +50,6 @@ func ScrapingImageUrl(contexts *gin.Context) {
 		return
 	}
 
-	// collector := colly.NewCollector()
-	// collector.Limit(&colly.LimitRule{
-	// 	Parallelism: 2,
-	// 	RandomDelay: 10 * time.Second,
-	// })
-	// var wg sync.WaitGroup
-	// idx := 1
-	// collector.OnHTML("img", func(e *colly.HTMLElement) {
-	// 	src := e.Request.AbsoluteURL(e.Attr("src"))
-
-	// 	if strings.HasPrefix(src, "data:") {
-	// 		return
-	// 	}
-
-	// 	if !isImageFile(src) {
-	// 		return
-	// 	}
-
-	// 	wg.Add(1)
-	// 	go func() {
-	// 		defer wg.Done()
-
-	// 		fileName := fmt.Sprintf("/%d.png", idx)
-	// 		err := downloadImage(src, outputDir, fileName)
-	// 		if err != nil {
-	// 			log.Printf("Error downloading image: %s\n", err)
-	// 		}
-	// 	}()
-	// 	idx++
-	// })
-
-	// collector.OnError(func(r *colly.Response, err error) {
-	// 	log.Err(err).Msgf("Error Request URL")
-	// })
-
-	// err = collector.Visit(scrapeURL)
-	// if err != nil {
-	// 	contexts.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	// 	return
-	// }
-
-	// wg.Wait()
 	ctx, cancel := chromedp.NewContext(context.Background())
 	defer cancel()
 
@@ -99,6 +57,8 @@ func ScrapingImageUrl(contexts *gin.Context) {
 	var imageURLs []string
 	err = chromedp.Run(ctx,
 		chromedp.Navigate(scrapeURL),
+		chromedp.Evaluate(`window.scrollTo(0, document.documentElement.scrollHeight)`, nil),
+		chromedp.Sleep(4*time.Second),
 		chromedp.Evaluate(`[...document.images].map(img => img.src)`, &imageURLs),
 	)
 	if err != nil {
@@ -115,8 +75,6 @@ func ScrapingImageUrl(contexts *gin.Context) {
 			log.Printf("Failed to download image %s: %v\n", imageURL, err)
 		}
 	}
-
-	time.Sleep(8 * time.Second)
 
 	utilities.GenerateVectorFromFolder(input.Token)
 	contexts.JSON(http.StatusOK, gin.H{"success": true})

@@ -92,6 +92,7 @@ func CheckColor(context *gin.Context) {
 	// read from json
 	file, err := os.Open("data/" + input.Token + "/data_color.json")
 	if err != nil {
+		context.JSON(http.StatusOK, gin.H{"success": false, "message": "Dataset masih kosong"})
 		fmt.Println("Error opening file:", err)
 		return
 	}
@@ -101,6 +102,7 @@ func CheckColor(context *gin.Context) {
 
 	decoder := json.NewDecoder(file)
 	if err := decoder.Decode(&data); err != nil {
+		context.JSON(http.StatusOK, gin.H{"success": false, "message": "Dataset masih kosong"})
 		fmt.Println("Error decoding JSON:", err)
 		return
 	}

@@ -89,6 +89,8 @@ func CheckTexture(context *gin.Context) {
 	// read from file
 	file, err := os.Open("data/" + input.Token + "/data_texture.json")
 	if err != nil {
+		context.JSON(http.StatusOK, gin.H{"success": false, "message": "Dataset masih kosong"})
+
 		fmt.Println("Error opening file:", err)
 		return
 	}
@@ -98,6 +100,8 @@ func CheckTexture(context *gin.Context) {
 
 	decoder := json.NewDecoder(file)
 	if err := decoder.Decode(&data); err != nil {
+		context.JSON(http.StatusOK, gin.H{"success": false, "message": "Dataset masih kosong"})
+
 		fmt.Println("Error decoding JSON:", err)
 		return
 	}
