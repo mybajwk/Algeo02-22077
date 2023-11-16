@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@nextui-org/react";
-import { FC, useEffect, useState } from "react";
+import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
 import FileUploadFiles from "./file-upload-files";
 import { useTabs } from "@/hooks/use-tabs";
 import { Framer } from "@/components/framer";
@@ -15,9 +15,10 @@ import Scrapping from "@/components/scrapping-component";
 interface ModalUploadProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  setTime: Dispatch<SetStateAction<number>>
 }
 
-const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open }) => {
+const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open, setTime }) => {
   const [images, setImages] = useState<ImageData[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [input, setInput] = useState<string>("");
@@ -56,6 +57,7 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open }) => {
   }, [input])
 
   const handleClick = async () => {
+    const timeStart = performance.now()
     try {
       setLoading(true);
       let token = window.sessionStorage.getItem("token-visumatch");
@@ -176,7 +178,10 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open }) => {
         setInput("")
         setImages([])
       }
-    } 
+    }
+    const timeEnd = performance.now()
+    const time = (timeEnd - timeStart) /1000
+    setTime(time)
   };
 
   return (

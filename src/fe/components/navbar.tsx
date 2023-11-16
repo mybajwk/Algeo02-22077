@@ -102,7 +102,7 @@ export const Navbar = () => {
               </p>
             </NavbarItem>
           ))}
-          <Dropdown classNames={{ content: "bg-indigo-800/80 text-slate-400" }}>
+          <Dropdown classNames={{ content: "bg-blue-800/80 text-slate-400" }}>
             <DropdownTrigger>
               <p
                 className={cn(
@@ -111,13 +111,6 @@ export const Navbar = () => {
                     ? "text-white after:scale-x-100"
                     : "text-slate-500"
                 )}
-                // onClick={() => {
-                //   setRedirect("yes");
-                //   setTimeout(() => {
-                //     router.push(item.href);
-                //     if (pathName === item.href) setRedirect("");
-                //   }, 1000);
-                // }}
               >
                 {linkSearch.label}
               </p>
@@ -125,7 +118,7 @@ export const Navbar = () => {
             <DropdownMenu
               aria-label="Link Actions"
               itemClasses={{
-                base: "data-[hover=true]:bg-blue-900/70 data-[hover=true]:text-white",
+                base: "data-[hover=true]:bg-indigo-900 data-[hover=true]:text-white",
               }}
             >
               {linkSearch.subLinks.map((link) => (

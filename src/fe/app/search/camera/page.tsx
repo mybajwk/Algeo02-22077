@@ -1,17 +1,11 @@
 "use client";
 
-import FileUpload from "@/components/file-upload";
 import ModalUpload from "@/components/modal-upload";
 import ResultContainer, { ImagesData } from "@/components/result-container";
 import Transition from "@/components/transition";
-import { convertFileToBase64 } from "@/lib/libs";
 import {
   Button,
   Divider,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
   Image,
   Pagination,
   Skeleton,
@@ -21,12 +15,15 @@ import {
 } from "@nextui-org/react";
 import { v4 } from "uuid";
 import { AnimatePresence, motion } from "framer-motion";
-import { CameraOff, ChevronDown, SwitchCamera, Trash2 } from "lucide-react";
+import {
+  Camera,
+  CameraOff,
+  RotateCcw,
+  SwitchCamera,
+} from "lucide-react";
 import React, {
   Key,
-  useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
@@ -42,12 +39,21 @@ const SearchCameraPage = () => {
   const [tokenVisumatch, setTokenVisumatch] = useState("");
   const [capturedImage, setCapturedImage] = useState<string>();
   const [captureEffect, setCaptureEffect] = useState(false);
+  const [rerender, setRerender] = useState(1);
+  const [timeUpload, setTimeUpload] = useState<number>(0)
+  const [timeSearch, setTimeSearch] = useState<number>(0)
+
+  const handleRerender = () => {
+    setRerender((prev) => prev + 1);
+  };
 
   const handleOpenModal = () => {
     setOpen(true);
   };
 
   const search = async (urlImg: string) => {
+    const timeStart = performance.now()
+
     setCurrentPage(1);
 
     try {
@@ -92,6 +98,9 @@ const SearchCameraPage = () => {
     } catch (error) {
       if (error instanceof Error) toast.error(error.message);
     }
+    const timeEnd = performance.now()
+    const time = (timeEnd - timeStart) /1000
+    setTimeSearch(time)
   };
 
   const handlePaginatiOnChange = async (page: number) => {
@@ -146,17 +155,17 @@ const SearchCameraPage = () => {
       const imageSrc = webcamRef.current.getScreenshot();
 
       setCapturedImage(imageSrc);
-      setCaptureEffect(true)
+      setCaptureEffect(true);
       // console.log(imageSrc);
       await search(imageSrc);
     }
   };
 
   useEffect(() => {
-    if (captureEffect){
-      setTimeout(() => setCaptureEffect(false), 200)
+    if (captureEffect) {
+      setTimeout(() => setCaptureEffect(false), 200);
     }
-  }, [captureEffect])
+  }, [captureEffect]);
 
   // const handleDevices = useCallback(
   //   (mediaDevices: any) =>
@@ -197,7 +206,7 @@ const SearchCameraPage = () => {
 
   return (
     <>
-      <ModalUpload open={open} onOpenChange={setOpen} />
+      <ModalUpload open={open} onOpenChange={setOpen} setTime={setTimeUpload} />
       <AnimatePresence mode="wait">
         <motion.div key="home" className="absolute h-full">
           <Transition />
@@ -216,19 +225,103 @@ const SearchCameraPage = () => {
                     screenshotFormat="image/jpeg"
                     videoConstraints={{ facingMode }}
                   />
-                  <div className={cn("absolute w-full h-full bg-white", captureEffect ? "flex" : "hidden")}/>
+                  <div
+                    className={cn(
+                      "absolute w-full h-full bg-white",
+                      captureEffect ? "flex" : "hidden"
+                    )}
+                  />
+                  <div className="med2:hidden absolute top-4 right-7 w-[100px] h-[80px]">
+                    {capturedImage ? (
+                      <Image
+                        src={capturedImage}
+                        alt="photo"
+                        radius="md"
+                        className="w-full h-full object-fill"
+                        removeWrapper
+                      />
+                    ) : (
+                      <></>
+                    )}
+                  </div>
                 </>
               ) : (
                 <>
-                  <Skeleton className="absolute w-full h-full" />
-                  <div className=" absolute flex justify-center gap-3 items-start font-sans my-auto mx-auto">
+                  <Skeleton className="absolute w-full h-full z-[400]" />
+                  <div className=" absolute flex justify-center gap-3 items-start font-sans my-auto mx-auto z-[500]">
                     <CameraOff className="w-5 h-5" />
                     <p className="text-white">Camera doesn't start</p>
                   </div>
                 </>
               )}
+              <div className="absolute w-full flex justify-between items-center flex-row med2:hidden bottom-2 z-[500] px-5">
+                <Button variant="light" isIconOnly onPress={toggleCamera}>
+                  {!isCameraOn ? (
+                    <CameraOff className="w-6 h-6" />
+                  ) : (
+                    <Camera className="h-6 w-6" />
+                  )}
+                </Button>
+                <Button variant="light" isIconOnly onPress={switchCamera}>
+                  <SwitchCamera className="h-6 w-6" />
+                </Button>
+              </div>
             </div>
-            <div className="flex flex-[1] flex-col justify-between w-full h-[300px] xl:h-[450px] gap-2">
+            <div className="med2:hidden flex">
+              <div className="flex flex-col sm:flex-row w-full gap-2 items-center">
+                <Tabs
+                  onSelectionChange={setSearchType}
+                  selectedKey={searchType}
+                  size="md"
+                  aria-label="Options"
+                  radius="md"
+                  variant="bordered"
+                  color="primary"
+                  classNames={{
+                    tabList: "gap-4 border-indigo-800 bg-[#0300145e] w-full",
+                    cursor:
+                      "bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%",
+                    base: "lg:flex md2:hidden sm:flex-[1.5] xl:flex-[1.2] w-full",
+                  }}
+                >
+                  <Tab key="color" title="Color" />
+                  <Tab key="texture" title="Texture" />
+                </Tabs>
+                <Tabs
+                  size="sm"
+                  aria-label="Options"
+                  radius="md"
+                  variant="bordered"
+                  color="primary"
+                  classNames={{
+                    tabList: "gap-4 border-indigo-800 bg-[#0300145e] w-full",
+                    cursor:
+                      "bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%",
+                    base: "hidden md2:flex lg:hidden sm:flex-[1.5] xl:flex-[1.2] w-full",
+                  }}
+                >
+                  <Tab key="color" title="Color" />
+                  <Tab key="texture" title="Texture" />
+                </Tabs>
+                <Button
+                  color="primary"
+                  size="md"
+                  className="lg:flex flex md2:hidden w-full sm:flex-1 bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%"
+                  onPress={handleOpenModal}
+                >
+                  Upload dataset
+                </Button>
+                <Button
+                  color="primary"
+                  size="sm"
+                  className="hidden md2:flex lg:hidden w-full sm:flex-1 bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%"
+                  onPress={handleOpenModal}
+                >
+                  Upload dataset
+                </Button>
+              </div>
+            </div>
+            <div className="med2:flex hidden flex-[1] flex-col justify-between w-full min-h-full gap-2 ">
               <div className="w-full h-full flex justify-center items-center">
                 <div className="relative flex justify-center items-center w-[350px] h-[200px] rounded-md">
                   {capturedImage ? (
@@ -249,7 +342,7 @@ const SearchCameraPage = () => {
                   )}
                 </div>
               </div>
-              <div className="w-full h-fit flex flex-col justify-center items-end gap-2">
+              <div className="w-full h-full flex flex-col justify-end items-center gap-2">
                 <div className="flex flex-col sm:flex-row w-full gap-2 items-center">
                   <Tabs
                     onSelectionChange={setSearchType}
@@ -269,22 +362,7 @@ const SearchCameraPage = () => {
                     <Tab key="color" title="Color" />
                     <Tab key="texture" title="Texture" />
                   </Tabs>
-                  <Tabs
-                    size="sm"
-                    aria-label="Options"
-                    radius="md"
-                    variant="bordered"
-                    color="primary"
-                    classNames={{
-                      tabList: "gap-4 border-indigo-800 bg-[#0300145e] w-full",
-                      cursor:
-                        "bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%",
-                      base: "hidden md2:flex lg:hidden sm:flex-[1.5] xl:flex-[1.2] w-full",
-                    }}
-                  >
-                    <Tab key="color" title="Color" />
-                    <Tab key="texture" title="Texture" />
-                  </Tabs>
+                 
                   <Button
                     color="primary"
                     size="md"
@@ -293,14 +371,7 @@ const SearchCameraPage = () => {
                   >
                     Upload dataset
                   </Button>
-                  <Button
-                    color="primary"
-                    size="sm"
-                    className="hidden md2:flex lg:hidden w-full sm:flex-1 bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%"
-                    onPress={handleOpenModal}
-                  >
-                    Upload dataset
-                  </Button>
+                  
                 </div>
                 <div className="flex flex-col sm:flex-row w-full gap-2 items-center">
                   {/* <Dropdown>
@@ -343,16 +414,7 @@ const SearchCameraPage = () => {
                   >
                     Switch Camera
                   </Button>
-                  <Button
-                    isDisabled={!isCameraOn}
-                    color="primary"
-                    size="sm"
-                    className="hidden md2:flex lg:hidden w-full sm:flex-1 bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%"
-                    onPress={switchCamera}
-                    endContent={<SwitchCamera className="w-4 h-4" />}
-                  >
-                    Switch Camera
-                  </Button>
+
                 </div>
                 <Button
                   onPress={toggleCamera}
@@ -380,7 +442,13 @@ const SearchCameraPage = () => {
             <div className="w-full">
               <div className="flex flex-row justify-between items-center p-1">
                 <h2 className="text-lg md:text-xl">Result</h2>
-                <p className="text-base md:text-md">Executed Time 13.5s</p>
+                <div className="flex flex-row gap-3 justify-end items-center">
+                <p className="text-base md:text-md">Uploaded Time {timeUpload.toFixed(2)}s</p>
+                  <p className="text-base md:text-md">Search Time {timeSearch.toFixed(2)}s</p>
+                  <Button isIconOnly variant="light" onPress={handleRerender}>
+                    <RotateCcw className="h-4 w-4 text-white" />
+                  </Button>
+                </div>
               </div>
             </div>
             <div className="min-h-[650px] w-full flex flex-col gap-3 justify-end items-center">
@@ -398,7 +466,17 @@ const SearchCameraPage = () => {
                       duration: 0.3,
                     }}
                   >
-                    <ResultContainer urls={imagesData} token={tokenVisumatch} />
+                    {imagesData.length !== 0 ? (
+                      <ResultContainer
+                        key={rerender}
+                        urls={imagesData}
+                        token={tokenVisumatch}
+                      />
+                    ) : (
+                      <div className="absolute -top-20 w-full h-full flex text-white font-spline text-lg justify-center items-center text-center">
+                        <p>No photo found</p>
+                      </div>
+                    )}
                   </motion.div>
                 </AnimatePresence>
               </>

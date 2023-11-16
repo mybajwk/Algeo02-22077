@@ -17,7 +17,7 @@ import {
 } from "@nextui-org/react";
 import { v4 } from "uuid";
 import { AnimatePresence, motion } from "framer-motion";
-import { Trash2 } from "lucide-react";
+import { RotateCcw, Trash2 } from "lucide-react";
 import React, { Key, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -30,9 +30,16 @@ const SearchPage = () => {
   const [totalPage, setTotalPage] = useState(1);
   const [searchType, setSearchType] = useState<Key>("color");
   const [tokenVisumatch, setTokenVisumatch] = useState("");
+  const [rerender, setRerender] = useState(1);
+  const [timeUpload, setTimeUpload] = useState<number>(0);
+  const [timeSearch, setTimeSearch] = useState<number>(0);
   const handleOnDelete = () => {
     setPhoto(null);
     setUrlImg("");
+  };
+
+  const handleRerender = () => {
+    setRerender((prev) => prev + 1);
   };
 
   const handleOpenModal = () => {
@@ -47,6 +54,7 @@ const SearchPage = () => {
   }, [photo]);
 
   const handleOnSubmit = async () => {
+    const timeStart = performance.now();
     setCurrentPage(1);
     try {
       if (photo) {
@@ -95,6 +103,10 @@ const SearchPage = () => {
     } catch (error) {
       if (error instanceof Error) toast.error(error.message);
     }
+
+    const timeEnd = performance.now();
+    const time = (timeEnd - timeStart) / 1000;
+    setTimeSearch(time);
   };
 
   const handlePaginatiOnChange = async (page: number) => {
@@ -107,15 +119,18 @@ const SearchPage = () => {
       }
       setTokenVisumatch(token);
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/image/page/${page}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          token: token,
-        }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/image/page/${page}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            token: token,
+          }),
+        }
+      );
 
       const resBody = await response.json();
 
@@ -137,7 +152,7 @@ const SearchPage = () => {
 
   return (
     <>
-      <ModalUpload open={open} onOpenChange={setOpen} />
+      <ModalUpload open={open} onOpenChange={setOpen} setTime={setTimeUpload} />
       <AnimatePresence mode="wait">
         <motion.div key="home" className="absolute h-full">
           <Transition />
@@ -284,15 +299,25 @@ const SearchPage = () => {
             <div className="w-full">
               <div className="flex flex-row justify-between items-center p-1">
                 <h2 className="text-lg md:text-xl">Result</h2>
-                <p className="text-base md:text-md">Executed Time 13.5s</p>
+                <div className="flex flex-row gap-3 justify-end items-center">
+                  <p className="text-base md:text-md">
+                    Uploaded Time {timeUpload.toFixed(2)}s
+                  </p>
+                  <p className="text-base md:text-md">
+                    Search Time {timeSearch.toFixed(2)}s
+                  </p>
+                  <Button isIconOnly variant="light" onPress={handleRerender}>
+                    <RotateCcw className="h-4 w-4 text-white" />
+                  </Button>
+                </div>
               </div>
             </div>
-            <div className="min-h-[650px] w-full flex flex-col gap-3 justify-end items-center">
+            <div className="relative min-h-[650px] w-full flex flex-col gap-3 justify-end items-center">
               <>
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={currentPage}
-                    className="h-full w-full flex justify-center items-center overflow-hidden"
+                    className="min-h-full w-full flex justify-center items-center overflow-hidden"
                     exit={{ opacity: 0 }}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 100 }}
@@ -302,7 +327,17 @@ const SearchPage = () => {
                       duration: 0.3,
                     }}
                   >
-                    <ResultContainer urls={imagesData} token={tokenVisumatch} />
+                    {imagesData.length !== 0 ? (
+                      <ResultContainer
+                        key={rerender}
+                        urls={imagesData}
+                        token={tokenVisumatch}
+                      />
+                    ) : (
+                      <div className="absolute -top-20 w-full h-full flex text-white font-spline text-lg justify-center items-center text-center">
+                        <p>No photo found</p>
+                      </div>
+                    )}
                   </motion.div>
                 </AnimatePresence>
               </>

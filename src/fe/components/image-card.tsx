@@ -16,7 +16,7 @@ const ImageCard: FC<ImageCardProps> = ({ url, token, similarity }) => {
   const handleDownload = () => {
     saveAs(
       `http://localhost:7780/media/${token}/${url}.png`,
-      `similarity${(similarity * 100).toFixed(2)}%`.replace(".", ",") + ".png"
+      `similarity${(similarity * 100).toFixed(4)}%`.replace(".", ",") + ".png"
     );
   };
 
@@ -41,7 +41,7 @@ const ImageCard: FC<ImageCardProps> = ({ url, token, similarity }) => {
       <div className="flex flex-row items-center justify-between absolute h-fit p-2 pl-6 w-[85%] z-[90] backdrop-blur-sm rounded-full bg-white/30 bottom-0 transition transform translate-y-[100%]  duration-[1s] origin-bottom ease-in-out group-hover:ease-in-out group-hover:translate-y-[-15%] left-auto right-auto">
         <div className="flex flex-col">
           <p className="text-black font-bold text-base">
-            {(similarity * 100).toFixed(2)}%
+            {(similarity * 100).toFixed(4)}%
           </p>
         </div>
         <Button
