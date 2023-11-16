@@ -21,17 +21,6 @@ import { Trash2 } from "lucide-react";
 import React, { Key, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-const paginationAnimationVariant = {
-  next: {
-    translateX: "100%",
-    opacity: 0,
-  },
-  prev: {
-    translateX: "-100%",
-    opacity: 0,
-  },
-};
-
 const SearchPage = () => {
   const [photo, setPhoto] = useState<File | null>(null);
   const [urlImg, setUrlImg] = useState<string>("");
@@ -73,7 +62,7 @@ const SearchPage = () => {
 
         //fetch API
         const response = await fetch(
-          `http://localhost:7780/image/${searchType}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/image/${searchType}`,
           {
             method: "POST",
             headers: {
@@ -118,7 +107,7 @@ const SearchPage = () => {
       }
       setTokenVisumatch(token);
 
-      const response = await fetch(`http://localhost:7780/image/page/${page}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/image/page/${page}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
