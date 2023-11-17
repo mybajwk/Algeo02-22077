@@ -46,6 +46,7 @@ RUN apk add --no-cache tzdata && \
   apk del tzdata
 
 COPY --from=builder /go/src/api/dist/api .
+COPY ./arial.ttf ./arial.ttf
 EXPOSE 3000
 ENTRYPOINT ["./api"]
 
@@ -72,5 +73,6 @@ RUN apk add --no-cache tzdata && \
   apk del tzdata
 
 COPY --from=builder /go/src/api/dist/api .
+COPY ./arial.ttf ./arial.ttf
 EXPOSE 3000
 ENTRYPOINT ["./api"]
