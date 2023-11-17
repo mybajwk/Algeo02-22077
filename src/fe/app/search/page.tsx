@@ -20,6 +20,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { RotateCcw, Trash2 } from "lucide-react";
 import React, { Key, useEffect, useState } from "react";
 import toast from "react-hot-toast";
+// import { useStore } from "@/hooks/use-store";
+// import { useToken } from "@/hooks/use-token";
 
 const SearchPage = () => {
   const [photo, setPhoto] = useState<File | null>(null);
@@ -33,6 +35,8 @@ const SearchPage = () => {
   const [rerender, setRerender] = useState(1);
   const [timeUpload, setTimeUpload] = useState<number>(0);
   const [timeSearch, setTimeSearch] = useState<number>(0);
+  // const tokens = useStore(useToken, (state) => state);
+
   const handleOnDelete = () => {
     setPhoto(null);
     setUrlImg("");
@@ -58,10 +62,10 @@ const SearchPage = () => {
     setCurrentPage(1);
     try {
       if (photo) {
-        let token = window.sessionStorage.getItem("token-visumatch");
+        let token = window.localStorage.getItem("token-visumatch");
         if (!token) {
           token = `${v4()}`.replaceAll("-", "");
-          window.sessionStorage.setItem("token-visumatch", token);
+          window.localStorage.setItem("token-visumatch", token);
         }
 
         setTokenVisumatch(token);
@@ -91,7 +95,7 @@ const SearchPage = () => {
         }
 
         if (!resBody.success) {
-          throw new Error(resBody.message)
+          throw new Error(resBody.message);
         }
 
         setTotalPage(resBody.page);
@@ -116,10 +120,10 @@ const SearchPage = () => {
   const handlePaginatiOnChange = async (page: number) => {
     try {
       setCurrentPage(page);
-      let token = window.sessionStorage.getItem("token-visumatch");
+      let token = window.localStorage.getItem("token-visumatch");
       if (!token) {
-        token = `${v4()}${v4()}`.replaceAll("-", "");
-        window.sessionStorage.setItem("token-visumatch", token);
+        token = `${v4()}`.replaceAll("-", "");
+        window.localStorage.setItem("token-visumatch", token);
       }
       setTokenVisumatch(token);
 

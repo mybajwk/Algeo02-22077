@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@nextui-org/react";
+import { Button, image } from "@nextui-org/react";
 import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
 import FileUploadFiles from "./file-upload-files";
 import { useTabs } from "@/hooks/use-tabs";
@@ -11,11 +11,13 @@ import { convertFileToBase64, zipFilesBase64 } from "@/lib/libs";
 import toast from "react-hot-toast";
 import { v4 } from "uuid";
 import Scrapping from "@/components/scrapping-component";
+// import { useStore } from "@/hooks/use-store";
+// import { TokenProps, useToken } from "@/hooks/use-token";
 
 interface ModalUploadProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  setTime: Dispatch<SetStateAction<number>>
+  setTime: Dispatch<SetStateAction<number>>;
 }
 
 const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open, setTime }) => {
@@ -24,6 +26,7 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open, setTime }) => {
   const [input, setInput] = useState<string>("");
   const [type, setType] = useState<string>("url");
   const [errorWS, setErrorWS] = useState<string>("");
+  // const tokens = useStore(useToken, (state) => state)
 
   const [hookProps] = useState({
     tabs: [
@@ -53,17 +56,17 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open, setTime }) => {
   const framer = useTabs(hookProps);
 
   useEffect(() => {
-    if (input) setErrorWS("")
-  }, [input])
+    if (input) setErrorWS("");
+  }, [input]);
 
   const handleClick = async () => {
-    const timeStart = performance.now()
+    const timeStart = performance.now();
     try {
       setLoading(true);
-      let token = window.sessionStorage.getItem("token-visumatch");
+      let token = window.localStorage.getItem("token-visumatch");
       if (!token) {
         token = `${v4()}`.replaceAll("-", "");
-        window.sessionStorage.setItem("token-visumatch", token);
+        window.localStorage.setItem("token-visumatch", token);
       }
 
       if (framer.selectedTab.label !== "Image Scrapping") {
@@ -79,17 +82,20 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open, setTime }) => {
           }
         }
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/image/upload-all`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            token: token,
-            captcha: "dhaehanadeaoe",
-            image: zipBase64,
-          }),
-        });
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/image/upload-all`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              token: token,
+              captcha: "dhaehanadeaoe",
+              image: zipBase64,
+            }),
+          }
+        );
 
         const resBody = await response.json();
 
@@ -100,13 +106,13 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open, setTime }) => {
         toast.success("dataset uploaded succesfull");
         onOpenChange(false);
         setLoading(false);
-        setErrorWS("")
-        setInput("")
-        setImages([])
+        setErrorWS("");
+        setInput("");
+        setImages([]);
       } else {
         if (!input) {
           setErrorWS("Input harus diisi tidak boleh kosong");
-          setLoading(false)
+          setLoading(false);
           return;
         }
 
@@ -116,7 +122,7 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open, setTime }) => {
 
           if (!urlRegex.test(input)) {
             setErrorWS("URL web tidak valid");
-            setLoading(false)
+            setLoading(false);
             return;
           }
           const response = await fetch(
@@ -160,28 +166,49 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open, setTime }) => {
           if (!response.ok) {
             throw new Error(resBody.message);
           }
-        }
+        } else if (type === "yandex") {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/image/scrap-url`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                token: token,
+                captcha: "dhaehanadeaoe",
+                text: `https://yandex.com/images/search?text=${input}`,
+              }),
+            }
+          );
 
-        toast.success("data for scrapping submited");
-        onOpenChange(false);
-        setLoading(false);
-        setErrorWS("")
-        setInput("")
-        setImages([])
+          const resBody = await response.json();
+
+          if (!response.ok) {
+            throw new Error(resBody.message);
+          }
+
+          toast.success("data for scrapping submited");
+          onOpenChange(false);
+          setLoading(false);
+          setErrorWS("");
+          setInput("");
+          setImages([]);
+        }
       }
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
         console.log(error.message);
         setLoading(false);
-        setErrorWS("")
-        setInput("")
-        setImages([])
+        setErrorWS("");
+        setInput("");
+        setImages([]);
       }
     }
-    const timeEnd = performance.now()
-    const time = (timeEnd - timeStart) /1000
-    setTime(time)
+    const timeEnd = performance.now();
+    const time = (timeEnd - timeStart) / 1000;
+    setTime(time);
   };
 
   return (
@@ -195,7 +222,11 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open, setTime }) => {
 
             <div className="pt-10">
               {framer.selectedTab.label === "Zip" ? (
-                <FileUploadFiles typeFile="zip" key="zip" />
+                <FileUploadFiles
+                  typeFile="zip"
+                  key="zip"
+                  setState={setImages}
+                />
               ) : framer.selectedTab.label === "Folder" ? (
                 <FileUploadFiles
                   key="folder"

@@ -39,13 +39,13 @@ const DescPage = () => {
             <div className="max-w-[75%]  lg:max-w-[900px] flex flex-col justify-center items-center">
               <ul className="list-disc text-justify">
                 <li>
-                  <p className="font=spline text-sm md:text-base text-white">
+                  <p className="font-spline text-sm md:text-base text-white">
                     Masuk kedalam halaman search baik default ataupun camera
                     tergantung dari Anda mau menggunakan fitur yang mana.
                   </p>
                 </li>
                 <li>
-                  <p className="font=spline text-sm md:text-base text-white">
+                  <p className="font-spline text-sm md:text-base text-white">
                     Upload dataset sebagai dasar untuk pencarian foto/gambar.
                     Untuk dataset ada beberapa pilihan, Anda bisa memilih untuk
                     mengupload dataset dalam bentuk zip, folder, maupun file.
@@ -55,9 +55,13 @@ const DescPage = () => {
                     bisa memilih dua pilihan yaitu memasukan url sebuah website
                     yang mau discrapping foto/gambar di dalamnya atau memasukkan
                     sebuah kata kunci dari sebuah foto/gambar. Jika memilih
-                    imaga scrapping dengan kata kunci maka nantinya website kami
+                    image scrapping dengan kata kunci maka nantinya website kami
                     akan mencari dan menscrapping foto atau gambar yang
-                    bersesuaian dengan kata kunci yang Anda masukan. Proses
+                    bersesuaian dengan kata kunci yang Anda masukan. Untuk
+                    scrapping dengan kata kunci juga terdapat pilihan
+                    menggunakan Yandex yang berarti kata kunci yang dimasukkan
+                    nantinya akan digunakan untuk mencari foto/gambar di Yandex
+                    kemudian program kami baru akan menscrappingnya. Proses
                     upload dataset mungkin akan sedikit lama apalagi jika
                     memilih untuk menggunakan folder atau file karena akan ada
                     proses kompresi menjadi zip terlebih dahulu sebelum proses
@@ -65,7 +69,7 @@ const DescPage = () => {
                   </p>
                 </li>
                 <li>
-                  <p className="font=spline text-sm md:text-base text-white">
+                  <p className="font-spline text-sm md:text-base text-white">
                     Setelah melakukan upload dataset langkah berikutnya hanya
                     tinggal mengupload sebuah foto/gambar lalu Anda hanya perlu
                     memilih mau menggunakan fitur pencarian dengan color atau
@@ -76,7 +80,7 @@ const DescPage = () => {
                   </p>
                 </li>
                 <li>
-                  <p className="font=spline text-sm md:text-base text-white">
+                  <p className="font-spline text-sm md:text-base text-white">
                     Jika menggunakan fitur camera, pertama-tama Anda harus
                     memilih mau menggunakan fitur pencarian dengan color atau
                     dengan texture. Kemudian Anda hanya tinggal menekan tombol
@@ -91,7 +95,7 @@ const DescPage = () => {
                   </p>
                 </li>
                 <li>
-                  <p className="font=spline text-sm md:text-base text-white">
+                  <p className="font-spline text-sm md:text-base text-white">
                     Setelah proses pencarian selesai, program kami kemudian akan
                     menampilkan gambar/foto beserta presentase kemiripannya pada
                     bagian bawah page search. Tingkat kemiripan sudah diurutkan
@@ -105,7 +109,7 @@ const DescPage = () => {
             </div>
           </div>
         </div>
-        <div className="w-full flex mt-20 flex-col gap-4 z-[600]">
+        <div className="w-full flex mt-20 flex-col gap-4 z-[600] pb-10">
           <h1 className="font-sora text-[50px] md:text-[60px] font-bold tracking-tight w-full bg-clip-text text-center text-transparent bg-gradient-to-tr  from-[#b3c8ff] via-[#467cff] to-[#0048ff] ">
             Technology
           </h1>
@@ -193,7 +197,10 @@ const DescPage = () => {
               </svg>
             </div>
             <div className="bg-indigo-800/40 rounded-lg p-3 hover:scale-[1.02] hover:bg-indigo-800/70 transition-all transform ease-in-out flex justify-center items-center">
-              <Image src="/gin.png" alt="foto" width={250} height={250}/>
+              <Image src="/gin.png" alt="foto" width={250} height={250} />
+            </div>
+            <div className="bg-indigo-800/40 rounded-lg p-3 hover:scale-[1.02] hover:bg-indigo-800/70 transition-all transform ease-in-out flex justify-center items-center">
+              <Image src="/google-chrome.png" alt="foto" width={200} height={200} />
             </div>
           </div>
         </div>

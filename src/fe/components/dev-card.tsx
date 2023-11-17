@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { FC } from "react";
-import { AiFillGithub, AiFillInstagram, AiFillInteraction } from "react-icons/ai";
+import { AiFillGithub, AiFillInstagram, AiFillInteraction, AiFillLinkedin } from "react-icons/ai";
 
 interface DevCardProps {
   developer: {
@@ -9,7 +9,8 @@ interface DevCardProps {
     NIM: string,
     github: string,
     instagram: string,
-    photo: string
+    photo: string,
+    linkedin: string
   }
 }
 
@@ -31,7 +32,9 @@ const DevCard: FC<DevCardProps> = ({ developer }) => {
           <Link href={developer.instagram} className="text-white hover:text-slate-400" rel="noopener noreferrer" target="_blank">
             <AiFillInstagram size={25} />
           </Link>
-
+          <Link href={developer.linkedin} className="text-white hover:text-slate-400" rel="noopener noreferrer" target="_blank">
+            <AiFillLinkedin size={25} />
+          </Link>
           </div>
         </div>
     </div>

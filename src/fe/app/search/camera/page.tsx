@@ -47,10 +47,10 @@ const SearchCameraPage = () => {
     setCurrentPage(1);
 
     try {
-      let token = window.sessionStorage.getItem("token-visumatch");
+      let token = window.localStorage.getItem("token-visumatch");
       if (!token) {
         token = `${v4()}`.replaceAll("-", "");
-        window.sessionStorage.setItem("token-visumatch", token);
+        window.localStorage.setItem("token-visumatch", token);
       }
 
       setTokenVisumatch(token);
@@ -100,10 +100,10 @@ const SearchCameraPage = () => {
   const handlePaginatiOnChange = async (page: number) => {
     try {
       setCurrentPage(page);
-      let token = window.sessionStorage.getItem("token-visumatch");
+      let token = window.localStorage.getItem("token-visumatch");
       if (!token) {
         token = `${v4()}${v4()}`.replaceAll("-", "");
-        window.sessionStorage.setItem("token-visumatch", token);
+        window.localStorage.setItem("token-visumatch", token);
       }
       setTokenVisumatch(token);
 
@@ -316,8 +316,8 @@ const SearchCameraPage = () => {
                 </Button>
               </div>
             </div>
-            <div className="med2:flex hidden flex-[1] flex-col justify-between w-full min-h-full gap-2 ">
-              <div className="w-full h-full flex justify-center items-center">
+            <div className="med2:flex hidden flex-[1] flex-col justify-between w-full min-h-full gap-2 z-[600]">
+              <div className="w-full h-full flex justify-center items-center ">
                 <div className="relative flex justify-center items-center w-[350px] h-[200px] rounded-md">
                   {capturedImage ? (
                     <Image
@@ -340,6 +340,7 @@ const SearchCameraPage = () => {
               <div className="w-full h-full flex flex-col justify-end items-center gap-2">
                 <div className="flex flex-col sm:flex-row w-full gap-2 items-center">
                   <Tabs
+                    isDisabled={isCameraOn}
                     onSelectionChange={setSearchType}
                     selectedKey={searchType}
                     size="md"
@@ -411,8 +412,8 @@ const SearchCameraPage = () => {
                 </div>
                 <Button
                   onPress={toggleCamera}
-                  variant="flat"
-                  className="flex md2:hidden lg:flex w-full transform duration-[0.5s] md ease-in-out hover:scale-[1.03] hover:text-white hover:after:translate-x-0 hover:after:translate-y-0  after:absolute after:origin-left after:transform after:ease-out after:translate-x-[-110%] after:translate-y-0 after:duration-[0.5s] after:left-0 after:z-[-1] after:content-[''] after:w-full after:h-full after:bg-gradient-to-br after:from-indigo-800 after:via-blue-800 after:via-30% after:to-blue-600 after:to-80%"
+                  variant="solid"
+                  className="flex md2:hidden lg:flex w-full bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%"
                   size="md"
                   color="primary"
                 >
@@ -420,8 +421,8 @@ const SearchCameraPage = () => {
                 </Button>
                 <Button
                   onPress={toggleCamera}
-                  variant="flat"
-                  className="lg:hidden hidden md2:flex w-full transform duration-[0.5s] md ease-in-out hover:scale-[1.03] hover:text-white hover:after:translate-x-0 hover:after:translate-y-0  after:absolute after:origin-left after:transform after:ease-out after:translate-x-[-110%] after:translate-y-0 after:duration-[0.5s] after:left-0 after:z-[-1] after:content-[''] after:w-full after:h-full after:bg-gradient-to-br after:from-indigo-800 after:via-blue-800 after:via-30% after:to-blue-600 after:to-80%"
+                  variant="solid"
+                  className="lg:hidden hidden md2:flex w-full bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%"
                   size="sm"
                   color="primary"
                 >
@@ -448,7 +449,7 @@ const SearchCameraPage = () => {
                 </div>
               </div>
             </div>
-            <div className="min-h-[650px] w-full flex flex-col gap-3 justify-end items-center">
+            <div className="relative min-h-[650px] w-full flex flex-col gap-3 justify-end items-center">
               <>
                 <AnimatePresence mode="wait">
                   <motion.div

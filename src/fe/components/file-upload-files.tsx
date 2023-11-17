@@ -56,8 +56,8 @@ const filesValidation = z
 const zipValidation = z
   .any()
   .refine((zip) => {
-    return zip.size <= 10000000;
-  }, "Max image size is 10MB")
+    return zip.size <= 1000000000;
+  }, "Max image size is 1000MB")
   .refine((zip) => {
     return zip.name.includes(...allowedZipTypes);
   }, "Only zip type are supported");
@@ -167,6 +167,8 @@ const FileUploadFiles = forwardRef<HTMLInputElement, FileUploadFilesProps>(
                 .join(", ");
             }
 
+            // console.log(e.target.files[i])
+
             const image: Image = {
               file: e.target.files[i],
               error: error,
@@ -226,8 +228,9 @@ const FileUploadFiles = forwardRef<HTMLInputElement, FileUploadFilesProps>(
     };
     const otherAtt = { directory: "", webkitdirectory: "" };
 
-    useEffect(() => {
-    }, [loading]);
+    // useEffect(() => {
+    //   console.log(images)
+    // }, [images]);
 
     return (
       <section className="flex h-fit min-w-full flex-col items-center justify-between gap-6 sm:flex-row sm:items-start">
@@ -374,7 +377,7 @@ const FileItem: React.FC<FileItemProps> = ({
           </p>
           <p
             className={cn(
-              "hyphens-auto font-montserrat text-[11px] leading-[14px] sm:text-xs",
+              "hyphens-auto font-spline text-[11px] leading-[14px] sm:text-xs",
               image.error ? "text-ted-red" : "text-[#1CCA00]"
             )}
           >
@@ -400,13 +403,13 @@ const FileItem: React.FC<FileItemProps> = ({
           <></>
         )}
         <div
-          className={twMerge(
+          className={cn(
             "flex items-center justify-center rounded-md border  px-2 py-1",
             image.error ? "border-ted-red" : "border-[#CDD3D8]"
           )}
         >
           <p
-            className={twMerge(
+            className={cn(
               "font-anderson text-[11px] font-bold leading-3",
               image.error ? "text-ted-red" : "text-gray-400"
             )}
