@@ -25,6 +25,7 @@ export const Navbar = () => {
   const pathName = usePathname();
   const [redirect, setRedirect] = useState("");
   const router = useRouter();
+  const [open, setOpen] = useState<boolean>(false)
   const links = [
     {
       label: "Home",
@@ -69,6 +70,8 @@ export const Navbar = () => {
         className="absolute w-full translate-x-[-100%] transition transform ease-in-out duration-[0.6s] data-[redirect=yes]:translate-x-0 h-full bg-[#2e2257] z-[900]"
       ></div>
       <NextUINavbar
+        onMenuOpenChange={setOpen}
+        isMenuOpen={open}
         maxWidth="full"
         position="sticky"
         className="shadow-lg shadow-indigo-800/30 bg-[#03001417] backdrop-blur-md py-2 px-0 phone:px-[16px] sm:px-[56px] lg:px-[122px] z-[800]"
@@ -141,7 +144,7 @@ export const Navbar = () => {
         </NavbarContent>
 
         <NavbarContent className="sm:hidden flex" justify="start">
-          <NavbarMenuToggle />
+          <NavbarMenuToggle/>
         </NavbarContent>
 
         <NavbarContent className="sm:hidden flex" justify="center">
@@ -163,13 +166,40 @@ export const Navbar = () => {
           </Link>
         </NavbarContent>
 
-        <NavbarMenu className="z-[800]">
+        <NavbarMenu className="z-[800]" >
           <div className="mx-4 mt-10 flex flex-col gap-2">
             {links.map((item, index) => (
               <NavbarMenuItem key={`${item}-${index}`}>
-                <Link className="text-white" href={item.href}>
+                <p
+                  onClick={() => {
+                    setRedirect("yes");
+                    setTimeout(() => {
+                      router.push(item.href);
+                      if (pathName === item.href) setRedirect("");
+                    }, 1000);
+                    setOpen(false)
+                  }}
+                >
                   {item.label}
-                </Link>
+                </p>
+              </NavbarMenuItem>
+            ))}
+            {linkSearch.subLinks.map((link, index) => (
+              <NavbarMenuItem key={`${index}-${link.label}`}>
+                <p
+                  onClick={() => {
+                    setRedirect("yes");
+                    setTimeout(() => {
+                      router.push(link.href);
+                      if (pathName === link.href) setRedirect("");
+                    }, 1000);
+                    setOpen(false)
+                  }}
+                >
+                  {link.label === "default"
+                    ? "Search Default"
+                    : "Search Camera"}
+                </p>
               </NavbarMenuItem>
             ))}
           </div>

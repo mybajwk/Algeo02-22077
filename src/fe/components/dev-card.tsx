@@ -17,7 +17,7 @@ const DevCard: FC<DevCardProps> = ({ developer }) => {
   return (
       <div className="card bg-[#8052FF]/20 hover:bg-[#8052FF]/50 backdrop-blur-sm">
         <div className="image">
-          <Image src="https://i.pinimg.com/originals/a4/7b/a5/a47ba59b4a353e0928ef0551ca44f980.jpg" alt="foto"/>
+          <Image src="/camera.png" alt="foto" width={260} height={260}/>
         </div>
         <div className="content flex flex-col items-center p-3">
           <h3 className="font-sora text-xl font-extrabold bg-gradient-to-br from-indigo-400 via-blue-300 via-30% to-blue-100 to-80% bg-clip-text text-transparent">{developer.name}</h3>
