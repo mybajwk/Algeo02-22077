@@ -90,6 +90,10 @@ const SearchPage = () => {
           throw new Error(resBody.message);
         }
 
+        if (!resBody.success) {
+          throw new Error(resBody.message)
+        }
+
         setTotalPage(resBody.page);
 
         if (resBody.data) {

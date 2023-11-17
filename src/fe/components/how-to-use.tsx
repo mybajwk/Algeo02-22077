@@ -88,7 +88,7 @@ const HowToUse = () => {
               </div>
             </div>
           </div>
-          <div className="w-full flex mt-9 justify-center items-center">
+          <div className="w-full flex mt-9 justify-center items-center gap-3 sm:flex-row flex-col">
             <Button
               className="relative w-[200px] group bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80% rounded-full hover:scale-[1.05] transition-all ease-in-out transform duration-250"
               size="lg"
@@ -100,6 +100,20 @@ const HowToUse = () => {
                 href="/search"
                 >
                 Get Started
+              </Link>
+              <MoveUpRight className="absolute right-3 top-[14px] h-5 w-4 hidden group-hover:flex" />
+            </Button>
+            <Button
+              className="relative w-[200px] group rounded-full hover:scale-[1.05] transition-all ease-in-out transform duration-250"
+              size="lg"
+              variant="bordered"
+              color="primary"
+            >
+              <Link
+                className="w-full h-full flex justify-center items-center"
+                href="/desc"
+                >
+                Learn More
               </Link>
               <MoveUpRight className="absolute right-3 top-[14px] h-5 w-4 hidden group-hover:flex" />
             </Button>

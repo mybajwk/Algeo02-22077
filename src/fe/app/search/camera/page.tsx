@@ -15,18 +15,8 @@ import {
 } from "@nextui-org/react";
 import { v4 } from "uuid";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  Camera,
-  CameraOff,
-  RotateCcw,
-  SwitchCamera,
-} from "lucide-react";
-import React, {
-  Key,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { Camera, CameraOff, RotateCcw, SwitchCamera } from "lucide-react";
+import React, { Key, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import Webcam from "react-webcam";
 
@@ -40,8 +30,8 @@ const SearchCameraPage = () => {
   const [capturedImage, setCapturedImage] = useState<string>();
   const [captureEffect, setCaptureEffect] = useState(false);
   const [rerender, setRerender] = useState(1);
-  const [timeUpload, setTimeUpload] = useState<number>(0)
-  const [timeSearch, setTimeSearch] = useState<number>(0)
+  const [timeUpload, setTimeUpload] = useState<number>(0);
+  const [timeSearch, setTimeSearch] = useState<number>(0);
 
   const handleRerender = () => {
     setRerender((prev) => prev + 1);
@@ -52,7 +42,7 @@ const SearchCameraPage = () => {
   };
 
   const search = async (urlImg: string) => {
-    const timeStart = performance.now()
+    const timeStart = performance.now();
 
     setCurrentPage(1);
 
@@ -88,6 +78,10 @@ const SearchCameraPage = () => {
         throw new Error(resBody.message);
       }
 
+      if (!resBody.success) {
+        throw new Error(resBody.message);
+      }
+
       setTotalPage(resBody.page);
 
       if (resBody.data) {
@@ -98,9 +92,9 @@ const SearchCameraPage = () => {
     } catch (error) {
       if (error instanceof Error) toast.error(error.message);
     }
-    const timeEnd = performance.now()
-    const time = (timeEnd - timeStart) /1000
-    setTimeSearch(time)
+    const timeEnd = performance.now();
+    const time = (timeEnd - timeStart) / 1000;
+    setTimeSearch(time);
   };
 
   const handlePaginatiOnChange = async (page: number) => {
@@ -363,7 +357,7 @@ const SearchCameraPage = () => {
                     <Tab key="color" title="Color" />
                     <Tab key="texture" title="Texture" />
                   </Tabs>
-                 
+
                   <Button
                     color="primary"
                     size="md"
@@ -372,7 +366,6 @@ const SearchCameraPage = () => {
                   >
                     Upload dataset
                   </Button>
-                  
                 </div>
                 <div className="flex flex-col sm:flex-row w-full gap-2 items-center">
                   {/* <Dropdown>
@@ -415,7 +408,6 @@ const SearchCameraPage = () => {
                   >
                     Switch Camera
                   </Button>
-
                 </div>
                 <Button
                   onPress={toggleCamera}
@@ -444,8 +436,12 @@ const SearchCameraPage = () => {
               <div className="flex flex-row justify-between items-center p-1">
                 <h2 className="text-lg md:text-xl">Result</h2>
                 <div className="flex flex-row gap-3 justify-end items-center">
-                <p className="text-base md:text-md">Uploaded Time {timeUpload.toFixed(2)}s</p>
-                  <p className="text-base md:text-md">Search Time {timeSearch.toFixed(2)}s</p>
+                  <p className="text-base md:text-md">
+                    Uploaded Time {timeUpload.toFixed(2)}s
+                  </p>
+                  <p className="text-base md:text-md">
+                    Search Time {timeSearch.toFixed(2)}s
+                  </p>
                   <Button isIconOnly variant="light" onPress={handleRerender}>
                     <RotateCcw className="h-4 w-4 text-white" />
                   </Button>
