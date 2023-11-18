@@ -69,7 +69,8 @@ func GeneratePDF(context *gin.Context) {
 
 	for _, arrImgPath := range data {
 		for _, imgPath := range arrImgPath {
-			title := fmt.Sprintf("Image with similarity %f", imgPath.Similarity*100)
+			title := fmt.Sprintf("Image with similarity %f%", imgPath.Similarity*100)
+			log.Info().Msgf("Image with similarity %f", imgPath.Similarity*100)
 			pdf.SetXY(x, y)
 			pdf.Cell(nil, title)
 			y += 20
@@ -105,6 +106,9 @@ func GeneratePDF(context *gin.Context) {
 	if err != nil {
 		log.Err(err).Msg("Error saving pdf")
 	}
+
+	context.JSON(http.StatusOK, gin.H{"success": true})
+
 }
 func Convert16BitTo8Bit(inputPath string) image.Image {
 	// Load the 16-bit depth image
