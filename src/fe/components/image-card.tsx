@@ -15,7 +15,7 @@ const ImageCard: FC<ImageCardProps> = ({ url, token, similarity }) => {
   const [loading, setLoading] = useState(false);
   const handleDownload = () => {
     saveAs(
-      `http://localhost:7780/media/${token}/${url}.png`,
+      `${process.env.NEXT_PUBLIC_API_URL}/media/${token}/${url}.png`,
       `similarity${(similarity * 100).toFixed(4)}%`.replace(".", ",") + ".png"
     );
   };
@@ -63,7 +63,7 @@ const ImageCard: FC<ImageCardProps> = ({ url, token, similarity }) => {
           className="w-full h-full object-cover"
           removeWrapper
           alt="NextUI hero Image with delay"
-          src={`http://localhost:7780/media/${token}/${url}.png`}
+          src={`${process.env.NEXT_PUBLIC_API_URL}/media/${token}/${url}.png`}
           onError={handleImageError}
           onLoad={handleImageLoad}
         />

@@ -103,6 +103,10 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open, setTime }) => {
           throw new Error(resBody.message);
         }
 
+        if (!resBody.success) {
+          throw new Error(resBody.message);
+        }
+
         toast.success("dataset uploaded succesfull");
         onOpenChange(false);
         setLoading(false);
@@ -145,6 +149,17 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open, setTime }) => {
           if (!response.ok) {
             throw new Error(resBody.message);
           }
+
+          if (!resBody.success) {
+            throw new Error(resBody.message);
+          }
+
+          toast.success("data for scrapping submited");
+          onOpenChange(false);
+          setLoading(false);
+          setErrorWS("");
+          setInput("");
+          setImages([]);
         } else if (type === "text") {
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/image/scrap-text`,
@@ -166,6 +181,17 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open, setTime }) => {
           if (!response.ok) {
             throw new Error(resBody.message);
           }
+
+          if (!resBody.success) {
+            throw new Error(resBody.message);
+          }
+
+          toast.success("data for scrapping submited");
+          onOpenChange(false);
+          setLoading(false);
+          setErrorWS("");
+          setInput("");
+          setImages([]);
         } else if (type === "yandex") {
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/image/scrap-url`,
@@ -185,6 +211,10 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open, setTime }) => {
           const resBody = await response.json();
 
           if (!response.ok) {
+            throw new Error(resBody.message);
+          }
+
+          if (!resBody.success) {
             throw new Error(resBody.message);
           }
 

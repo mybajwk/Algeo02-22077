@@ -40,8 +40,8 @@ const DescPage = () => {
               <ul className="list-disc text-justify">
                 <li>
                   <p className="font-spline text-sm md:text-base text-white">
-                    Masuk kedalam halaman search baik default ataupun camera
-                    tergantung dari Anda mau menggunakan fitur yang mana.
+                    Masuk   kedalam halaman   search baik default    ataupun camera
+                    tergantung  dari Anda   mau menggunakan fitur    yang mana.
                   </p>
                 </li>
                 <li>
@@ -102,7 +102,11 @@ const DescPage = () => {
                     dari yang terbesar hingga ke yang terkecil. Foto atau gambar
                     yang kami tampilkan hanyalah foto/gambar dengan tingkat
                     kemiripan diatas 60%. Kami sendiri juga menyediakan opsi
-                    jika Anda ingin mendownload foto/gambar tersebut.
+                    jika Anda ingin mendownload foto/gambar tersebut. Selain itu
+                    dibagian paling bawah page search juga terdapat opsi jika
+                    anda ingin mendownload semua hasil ke dalam bentuk pdf.
+                    Dalam file tersebut akan terdapat data foto dan juga tingkat
+                    kemiripannya.
                   </p>
                 </li>
               </ul>
@@ -200,7 +204,12 @@ const DescPage = () => {
               <Image src="/gin.png" alt="foto" width={250} height={250} />
             </div>
             <div className="bg-indigo-800/40 rounded-lg p-3 hover:scale-[1.02] hover:bg-indigo-800/70 transition-all transform ease-in-out flex justify-center items-center">
-              <Image src="/google-chrome.png" alt="foto" width={200} height={200} />
+              <Image
+                src="/google-chrome.png"
+                alt="foto"
+                width={200}
+                height={200}
+              />
             </div>
           </div>
         </div>

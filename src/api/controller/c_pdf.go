@@ -67,9 +67,9 @@ func GeneratePDF(context *gin.Context) {
 	x, y := 10.0, 10.0
 	_, h := 100.0, 0.0
 
-	for _, arrImgPath := range data {
-		for _, imgPath := range arrImgPath {
-			title := fmt.Sprintf("Image with similarity %f%", imgPath.Similarity*100)
+	for i := range data {
+		for _, imgPath := range data[i] {
+			title := fmt.Sprintf("Image with similarity %f", imgPath.Similarity*100)
 			log.Info().Msgf("Image with similarity %f", imgPath.Similarity*100)
 			pdf.SetXY(x, y)
 			pdf.Cell(nil, title)

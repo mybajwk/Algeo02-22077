@@ -19,6 +19,8 @@ import { Camera, CameraOff, RotateCcw, SwitchCamera } from "lucide-react";
 import React, { Key, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import Webcam from "react-webcam";
+import { saveAs } from "file-saver";
+
 
 const SearchCameraPage = () => {
   const [open, setOpen] = useState(false);
@@ -32,6 +34,8 @@ const SearchCameraPage = () => {
   const [rerender, setRerender] = useState(1);
   const [timeUpload, setTimeUpload] = useState<number>(0);
   const [timeSearch, setTimeSearch] = useState<number>(0);
+  const [loadingPDF, setLoadingPDF] = useState(false)
+
 
   const handleRerender = () => {
     setRerender((prev) => prev + 1);
@@ -58,7 +62,7 @@ const SearchCameraPage = () => {
       const base64File = urlImg.split(",")[1];
       //fetch API
       const response = await fetch(
-        `http://localhost:7780/image/${searchType}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/image/${searchType}`,
         {
           method: "POST",
           headers: {
@@ -77,6 +81,11 @@ const SearchCameraPage = () => {
       if (!response.ok) {
         throw new Error(resBody.message);
       }
+
+      if (!resBody.success) {
+        throw new Error(resBody.message);
+      }
+
 
       if (!resBody.success) {
         throw new Error(resBody.message);
@@ -107,7 +116,7 @@ const SearchCameraPage = () => {
       }
       setTokenVisumatch(token);
 
-      const response = await fetch(`http://localhost:7780/image/page/${page}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/image/page/${page}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -122,6 +131,12 @@ const SearchCameraPage = () => {
       if (!response.ok) {
         throw new Error(resBody.message);
       }
+
+      if (!resBody.success) {
+        throw new Error(resBody.message);
+      }
+
+
       if (resBody.data) {
         setImagesData([...resBody.data]);
       } else {
@@ -198,6 +213,55 @@ const SearchCameraPage = () => {
   //   () => Array.from(selectedKeys)[0],
   //   [selectedKeys]
   // );
+
+  const handleDownloadPDF = async () => {
+    setLoadingPDF(true)
+    try {
+      let token = window.localStorage.getItem("token-visumatch");
+      if (!token) {
+        token = `${v4()}`.replaceAll("-", "");
+        window.localStorage.setItem("token-visumatch", token);
+      }
+      setTokenVisumatch(token);
+      console.log("tes")
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/image/pdf`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            token: token,
+          }),
+        }
+      );
+
+      // const resBody = await response.json();
+
+      // console.log(resBody)
+      // if (!response.ok) {
+      //   throw new Error(resBody.message);
+      // }
+      
+      // if (!resBody.success) {
+      //   throw new Error(resBody.message);
+      // }
+
+      console.log(`${process.env.NEXT_PUBLIC_API_URL}/media/${token}/file.pdf`)
+
+      saveAs(`${process.env.NEXT_PUBLIC_API_URL}/media/${token}/file.pdf`)
+
+
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log(error);
+        toast.error(error.message);
+      }
+    }
+    setLoadingPDF(false)
+  }
 
   return (
     <>
@@ -509,6 +573,14 @@ const SearchCameraPage = () => {
               </div>
             </div>
           </div>
+          <Divider />
+          {imagesData.length !== 0 ?
+          (<div className="w-full flex justify-center items-center mb-10"  >
+            <Button size="md" isLoading={loadingPDF} variant="solid" className="bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%" radius="full" onPress={handleDownloadPDF}>
+              Download PDF
+            </Button>
+          </div>)
+          : <></>}
         </div>
       </AnimatePresence>
     </>
