@@ -122,7 +122,7 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open, setTime }) => {
 
         if (type === "url") {
           const urlRegex: RegExp =
-            /^(https?:\/\/www\.|https?:\/\/|http:\/\/www\.|http:\/\/)?[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9]{2,})+(\.[a-zA-Z0-9]{2,})?$/i;
+          /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,})(\/[\w.-]*)*\/?$/;
 
           if (!urlRegex.test(input)) {
             setErrorWS("URL web tidak valid");
