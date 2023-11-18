@@ -21,7 +21,6 @@ import toast from "react-hot-toast";
 import Webcam from "react-webcam";
 import { saveAs } from "file-saver";
 
-
 const SearchCameraPage = () => {
   const [open, setOpen] = useState(false);
   const [imagesData, setImagesData] = useState<ImagesData[]>([]);
@@ -34,8 +33,7 @@ const SearchCameraPage = () => {
   const [rerender, setRerender] = useState(1);
   const [timeUpload, setTimeUpload] = useState<number>(0);
   const [timeSearch, setTimeSearch] = useState<number>(0);
-  const [loadingPDF, setLoadingPDF] = useState(false)
-
+  const [loadingPDF, setLoadingPDF] = useState(false);
 
   const handleRerender = () => {
     setRerender((prev) => prev + 1);
@@ -86,7 +84,6 @@ const SearchCameraPage = () => {
         throw new Error(resBody.message);
       }
 
-
       if (!resBody.success) {
         throw new Error(resBody.message);
       }
@@ -116,15 +113,18 @@ const SearchCameraPage = () => {
       }
       setTokenVisumatch(token);
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/image/page/${page}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          token: token,
-        }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/image/page/${page}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            token: token,
+          }),
+        }
+      );
 
       const resBody = await response.json();
 
@@ -135,7 +135,6 @@ const SearchCameraPage = () => {
       if (!resBody.success) {
         throw new Error(resBody.message);
       }
-
 
       if (resBody.data) {
         setImagesData([...resBody.data]);
@@ -215,7 +214,7 @@ const SearchCameraPage = () => {
   // );
 
   const handleDownloadPDF = async () => {
-    setLoadingPDF(true)
+    setLoadingPDF(true);
     try {
       let token = window.localStorage.getItem("token-visumatch");
       if (!token) {
@@ -223,7 +222,7 @@ const SearchCameraPage = () => {
         window.localStorage.setItem("token-visumatch", token);
       }
       setTokenVisumatch(token);
-      console.log("tes")
+      console.log("tes");
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/image/pdf`,
@@ -238,30 +237,33 @@ const SearchCameraPage = () => {
         }
       );
 
-      // const resBody = await response.json();
+      const resBody = await response.json();
 
-      // console.log(resBody)
-      // if (!response.ok) {
-      //   throw new Error(resBody.message);
-      // }
-      
-      // if (!resBody.success) {
-      //   throw new Error(resBody.message);
-      // }
+      console.log(resBody);
+      if (!response.ok) {
+        throw new Error(resBody.message);
+      }
 
-      console.log(`${process.env.NEXT_PUBLIC_API_URL}/media/${token}/file.pdf`)
+      if (!resBody.success) {
+        throw new Error(resBody.message);
+      }
 
-      saveAs(`${process.env.NEXT_PUBLIC_API_URL}/media/${token}/file.pdf`)
-
-
+      const pdfUrl = `${process.env.NEXT_PUBLIC_API_URL}/media/${token}/file.pdf`;
+      const link = document.createElement("a");
+      link.target = "_blank";
+      link.href = pdfUrl;
+      link.download = "result.pdf"; // specify the filename
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } catch (error) {
       if (error instanceof Error) {
         console.log(error);
         toast.error(error.message);
       }
     }
-    setLoadingPDF(false)
-  }
+    setLoadingPDF(false);
+  };
 
   return (
     <>
@@ -329,6 +331,7 @@ const SearchCameraPage = () => {
             <div className="med2:hidden flex">
               <div className="flex flex-col sm:flex-row w-full gap-2 items-center">
                 <Tabs
+                  isDisabled={isCameraOn}
                   onSelectionChange={setSearchType}
                   selectedKey={searchType}
                   size="md"
@@ -347,6 +350,7 @@ const SearchCameraPage = () => {
                   <Tab key="texture" title="Texture" />
                 </Tabs>
                 <Tabs
+                  isDisabled={isCameraOn}
                   size="sm"
                   aria-label="Options"
                   radius="md"
@@ -574,13 +578,22 @@ const SearchCameraPage = () => {
             </div>
           </div>
           <Divider />
-          {imagesData.length !== 0 ?
-          (<div className="w-full flex justify-center items-center mb-10"  >
-            <Button size="md" isLoading={loadingPDF} variant="solid" className="bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%" radius="full" onPress={handleDownloadPDF}>
-              Download PDF
-            </Button>
-          </div>)
-          : <></>}
+          {imagesData.length !== 0 ? (
+            <div className="w-full flex justify-center items-center mb-10">
+              <Button
+                size="md"
+                isLoading={loadingPDF}
+                variant="solid"
+                className="bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%"
+                radius="full"
+                onPress={handleDownloadPDF}
+              >
+                Download PDF
+              </Button>
+            </div>
+          ) : (
+            <></>
+          )}
         </div>
       </AnimatePresence>
     </>
