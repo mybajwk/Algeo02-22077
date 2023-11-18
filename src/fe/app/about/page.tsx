@@ -18,20 +18,20 @@ const AboutPage = () => {
       linkedin: "https://www.linkedin.com/in/mesach-harmasendro-66ba70218/",
     },
     {
-      name: "Naufal Adnan",
-      NIM: "13522116",
-      github: "https://github.com/nanthedom",
-      instagram: "https://www.instagram.com/naufaladnannn/",
-      photo: "/enrique-foto.jpg",
-      linkedin: "https://www.linkedin.com/in/naufal-adnan-3bab93233/",
-    },
-    {
       name: "Enrique Yanuar",
       NIM: "13522077",
       github: "https://github.com/mybajwk",
       instagram: "https://www.instagram.com/enriqueyanuar/",
-      photo: "/adnan-foto.jpg",
+      photo: "/enrique-foto.jpg",
       linkedin: "https://www.linkedin.com/in/enrique-yanuar-00921b256/",
+    },
+    {
+      name: "Naufal Adnan",
+      NIM: "13522116",
+      github: "https://github.com/nanthedom",
+      instagram: "https://www.instagram.com/naufaladnannn/",
+      photo: "/adnan-foto.jpg",
+      linkedin: "https://www.linkedin.com/in/naufal-adnan-3bab93233/",
     },
   ];
 
