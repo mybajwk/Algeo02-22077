@@ -19,14 +19,14 @@ const DescPage = () => {
         <div className="w-full font-spline text-justify text-sm md:text-base text-white rounded-lg min-h-[350px] max-w-[75%] lg:max-w-[900px]">
           <p>
             {`Search image yang kami buat menerapkan teori CBIR atau Content-Based Image Retrieval. 
-            Content-Based Image Retrieval sendiri (CBIR) merupakan sebuah proses yang
+            Content-Based Image Retrieval (CBIR) merupakan sebuah proses yang
             digunakan untuk mencari dan mengambil gambar berdasarkan konten
             visual gambar seperti warna, tekstur, dan bentuk, tanpa bergantung
             pada kata kunci atau teks. Hal ini membuat CBIR sangat berguna dalam
             mengakses dan mengeksplorasi koleksi gambar ketika tidak ada
             informasi teks atau kata kunci yang cukup untuk mendeskripsikan
-            gambar yang dicari. Fitur-fitur penting dari gambar, seperti warna,
-            tekstur, dan bentuk akan diekstraksi terlebih dahulu sebelum
+            gambar yang dicari. Fitur-fitur penting dari gambar seperti warna,
+            tekstur, dan bentuk, akan diekstraksi terlebih dahulu sebelum
             selanjutnya akan diwakili dalam bentuk vektor atau deskripsi
             numerik. Lalu CBIR menggunakan algoritma pencocokan untuk
             membandingkan vektor-fitur dari gambar yang dicari dengan
@@ -34,7 +34,7 @@ const DescPage = () => {
             dapat digunakan untuk mengurutkan gambar-gambar dalam dataset dan
             menampilkan gambar yang paling sesuai dengan gambar yang dicari.
             Implementasi CBIR yang paling populer digunakan adalah CBIR dengan
-            parameter warna dan CBIR dengan parameter/tekstur.`}
+            parameter warna dan CBIR dengan parameter tekstur.`}
           </p>
         </div>
         <div
@@ -54,73 +54,64 @@ const DescPage = () => {
               <ul className="list-disc text-justify">
                 <li>
                   <p className="font-spline text-sm md:text-base text-white">
-                    Masuk kedalam halaman search baik default ataupun camera
-                    tergantung dari Anda mau menggunakan fitur yang mana.
+                    Masuk ke dalam halaman search, baik default ataupun camera, 
+                    sesuaikan dengan preferensi Anda.
                   </p>
                 </li>
                 <li>
                   <p className="font-spline text-sm md:text-base text-white">
-                    Upload dataset sebagai dasar untuk pencarian foto/gambar.
-                    Untuk dataset ada beberapa pilihan, Anda bisa memilih untuk
-                    mengupload dataset dalam bentuk zip, folder, maupun file.
-                    Selain itu kami juga menyediakan fitur image scrapping untuk
-                    pencarian dataset sehingga Anda tidak perlu mengupload
-                    manual sebuah dataset. Untuk image scrapping sendiri Anda
-                    bisa memilih dua pilihan yaitu memasukan url sebuah website
-                    yang mau discrapping foto/gambar di dalamnya atau memasukkan
-                    sebuah kata kunci dari sebuah foto/gambar. Jika memilih
-                    image scrapping dengan kata kunci maka nantinya website kami
-                    akan mencari dan menscrapping foto atau gambar yang
-                    bersesuaian dengan kata kunci yang Anda masukan. Untuk
-                    scrapping dengan kata kunci juga terdapat pilihan
-                    menggunakan Yandex yang berarti kata kunci yang dimasukkan
-                    nantinya akan digunakan untuk mencari foto/gambar di Yandex
-                    kemudian program kami baru akan menscrappingnya. Proses
-                    upload dataset mungkin akan sedikit lama apalagi jika
-                    memilih untuk menggunakan folder atau file karena akan ada
-                    proses kompresi menjadi zip terlebih dahulu sebelum proses
-                    berlanjut.
+                  Upload dataset sebagai dasar untuk pencarian gambar.
+                  Anda dapat memilih untuk mengunggah dataset dalam bentuk zip, 
+                  folder, atau file. Anda juga juga dapat menggunakan fitur image 
+                  scraping untuk mencari dataset sehingga Anda tidak perlu 
+                  mengunggah manual sebuah dataset. Untuk image scraping sendiri 
+                  Anda bisa memilih dua pilihan, yaitu memasukkan url sebuah 
+                  website yang mau di-scraping gambar di dalamnya atau memasukkan
+                  sebuah kata kunci dari sebuah gambar. Jika memilih image scraping
+                  dengan kata kunci maka nantinya website kami akan mencari dan 
+                  melakukan scraping gambar yang bersesuaian dengan kata kunci 
+                  yang Anda masukan. Untuk scraping dengan kata kunci juga terdapat 
+                  pilihan menggunakan Yandex yang berarti kata kunci yang dimasukkan
+                  nantinya akan digunakan untuk mencari gambar di Yandex kemudian 
+                  program kami baru akan melakukan scraping. Proses mengunggah 
+                  dataset mungkin akan sedikit lama apalagi jika memilih untuk 
+                  menggunakan folder atau file karena akan ada proses kompresi 
+                  menjadi zip terlebih dahulu sebelum proses berlanjut.
                   </p>
                 </li>
                 <li>
                   <p className="font-spline text-sm md:text-base text-white">
-                    Setelah melakukan upload dataset langkah berikutnya hanya
-                    tinggal mengupload sebuah foto/gambar lalu Anda hanya perlu
-                    memilih mau menggunakan fitur pencarian dengan color atau
-                    dengan texture. Setelah memilih hal tersebut Anda hanya
-                    tinggal menekan tombol submit dan kemudian website kami akan
-                    mencarikan dari dataset foto/gambar yang serupa dengan
-                    foto/gambar yang Anda upload.
+                  Setelah mengunggah dataset, langkah berikutnya hanya tinggal 
+                  mengunggah sebuah gambar yang ingin Anda cari kesamaannya dalam 
+                  dataset. Anda perlu memilih untuk menggunakan fitur pencarian 
+                  dengan color atau dengan texture. Setelah memilih, Anda perlu 
+                  menekan tombol submit dan kemudian website kami akan melakukan 
+                  proses pencarian kesamaan dari dataset gambar yang serupa dengan 
+                  gambar yang Anda upload.
                   </p>
                 </li>
                 <li>
                   <p className="font-spline text-sm md:text-base text-white">
-                    Jika menggunakan fitur camera, pertama-tama Anda harus
-                    memilih mau menggunakan fitur pencarian dengan color atau
-                    dengan texture. Kemudian Anda hanya tinggal menekan tombol
-                    start camera untuk menyalakan camera lalu setelah itu Anda
-                    hanya perlu mengarahkan camera device Anda ke sesuatu hal
-                    yang mau Anda cari. Secara otomatis website kami akan
-                    melakukan pengambilan gambar setiap 10 detik kemudian hasil
-                    dari pengambilan gambar itu akan kami gunakan untuk mencari
-                    foto yang serupa yang ada dataset. Jika menggunakan HP Anda
-                    juga bisa memilih mau menggunakan camera depan atau belakang
-                    hanya dengan menekan tombol switch camera.
+                  Jika menggunakan fitur camera, pertama-tama Anda harus memilih 
+                  akan menggunakan fitur pencarian dengan color atau dengan texture. 
+                  Kemudian tekan tombol start camera untuk menyalakan camera lalu 
+                  arahkan camera device Anda ke sesuatu hal yang mau Anda cari. 
+                  Secara otomatis website kami akan melakukan pengambilan gambar 
+                  setiap 10 detik. Hasil dari pengambilan gambar itu akan kami 
+                  gunakan untuk mencari foto yang serupa yang ada dataset. Jika 
+                  menggunakan mobile phone Anda juga bisa memilih untuk menggunakan 
+                  camera depan atau belakang dengan menekan tombol switch camera.
                   </p>
                 </li>
                 <li>
                   <p className="font-spline text-sm md:text-base text-white">
-                    Setelah proses pencarian selesai, program kami kemudian akan
-                    menampilkan gambar/foto beserta presentase kemiripannya pada
-                    bagian bawah page search. Tingkat kemiripan sudah diurutkan
-                    dari yang terbesar hingga ke yang terkecil. Foto atau gambar
-                    yang kami tampilkan hanyalah foto/gambar dengan tingkat
-                    kemiripan diatas 60%. Kami sendiri juga menyediakan opsi
-                    jika Anda ingin mendownload foto/gambar tersebut. Selain itu
-                    dibagian paling bawah page search juga terdapat opsi jika
-                    anda ingin mendownload semua hasil ke dalam bentuk pdf.
-                    Dalam file tersebut akan terdapat data foto dan juga tingkat
-                    kemiripannya.
+                  Setelah proses pencarian selesai, program kami akan menampilkan 
+                  gambar beserta presentase kemiripannya pada bagian bawah page search. 
+                  Tingkat kemiripan diurutkan dari yang terbesar hingga ke yang terkecil. 
+                  Gambar yang kami tampilkan adalah gambar dengan tingkat kemiripan 
+                  diatas 60%. Kami juga menyediakan pilihan jika Anda ingin mengunduh 
+                  gambar tersebut di bagian paling bawah page search. Dalam file tersebut 
+                  akan terdapat data gambar dan juga tingkat kemiripannya.
                   </p>
                 </li>
               </ul>
