@@ -55,6 +55,22 @@ const Scrapping: FC<ScrappingProps> = ({ input, setInput, error, setType }) => {
             />
           </div>
         </Tab>
+        <Tab key="yandex" title="Yandex">
+          <div className="flex w-full">
+            <Input
+              value={input}
+              onValueChange={setInput}
+              isRequired
+              type="text"
+              label="Masukan kata kunci gambar yang mau dicari (search with yandex): "
+              className="w-full"
+              radius="md"
+              labelPlacement="inside"
+              errorMessage={error && error}
+              color={error ? "danger" : "default"}
+            />
+          </div>
+        </Tab>
       </Tabs>
     </div>
   );

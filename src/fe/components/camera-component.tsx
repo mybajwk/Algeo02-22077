@@ -14,7 +14,6 @@ const CameraComponent = () => {
     if (webcamRef.current) {
       const imageSrc = webcamRef.current.getScreenshot();
       setCapturedImage(imageSrc);
-      console.log(imageSrc);
     }
   };
 

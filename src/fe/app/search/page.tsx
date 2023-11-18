@@ -20,6 +20,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { RotateCcw, Trash2 } from "lucide-react";
 import React, { Key, useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { saveAs } from "file-saver";
+// import { useStore } from "@/hooks/use-store";
+// import { useToken } from "@/hooks/use-token";
 
 const SearchPage = () => {
   const [photo, setPhoto] = useState<File | null>(null);
@@ -33,6 +36,9 @@ const SearchPage = () => {
   const [rerender, setRerender] = useState(1);
   const [timeUpload, setTimeUpload] = useState<number>(0);
   const [timeSearch, setTimeSearch] = useState<number>(0);
+  const [loadingPDF, setLoadingPDF] = useState(false);
+  // const tokens = useStore(useToken, (state) => state);
+
   const handleOnDelete = () => {
     setPhoto(null);
     setUrlImg("");
@@ -58,10 +64,10 @@ const SearchPage = () => {
     setCurrentPage(1);
     try {
       if (photo) {
-        let token = window.sessionStorage.getItem("token-visumatch");
+        let token = window.localStorage.getItem("token-visumatch");
         if (!token) {
           token = `${v4()}`.replaceAll("-", "");
-          window.sessionStorage.setItem("token-visumatch", token);
+          window.localStorage.setItem("token-visumatch", token);
         }
 
         setTokenVisumatch(token);
@@ -91,7 +97,7 @@ const SearchPage = () => {
         }
 
         if (!resBody.success) {
-          throw new Error(resBody.message)
+          throw new Error(resBody.message);
         }
 
         setTotalPage(resBody.page);
@@ -116,10 +122,10 @@ const SearchPage = () => {
   const handlePaginatiOnChange = async (page: number) => {
     try {
       setCurrentPage(page);
-      let token = window.sessionStorage.getItem("token-visumatch");
+      let token = window.localStorage.getItem("token-visumatch");
       if (!token) {
-        token = `${v4()}${v4()}`.replaceAll("-", "");
-        window.sessionStorage.setItem("token-visumatch", token);
+        token = `${v4()}`.replaceAll("-", "");
+        window.localStorage.setItem("token-visumatch", token);
       }
       setTokenVisumatch(token);
 
@@ -141,6 +147,11 @@ const SearchPage = () => {
       if (!response.ok) {
         throw new Error(resBody.message);
       }
+
+      if (!resBody.success) {
+        throw new Error(resBody.message);
+      }
+
       if (resBody.data) {
         setImagesData([...resBody.data]);
       } else {
@@ -152,6 +163,59 @@ const SearchPage = () => {
         toast.error(error.message);
       }
     }
+  };
+
+  const handleDownloadPDF = async () => {
+    setLoadingPDF(true);
+    try {
+      let token = window.localStorage.getItem("token-visumatch");
+      if (!token) {
+        token = `${v4()}`.replaceAll("-", "");
+        window.localStorage.setItem("token-visumatch", token);
+      }
+      setTokenVisumatch(token);
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/image/pdf`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            token: token,
+          }),
+        }
+      );
+
+      const resBody = await response.json();
+
+      console.log(resBody);
+      if (!response.ok) {
+        throw new Error(resBody.message);
+      }
+
+      if (!resBody.success) {
+        throw new Error(resBody.message);
+      }
+
+      // setTimeout(() => saveAs(`${process.env.NEXT_PUBLIC_API_URL}/media/${token}/file.pdf`), 2000)
+
+      const pdfUrl = `${process.env.NEXT_PUBLIC_API_URL}/media/${token}/file.pdf`;
+      const link = document.createElement("a");
+      link.target = "_blank"
+      link.href = pdfUrl;
+      link.download = "result.pdf"; // specify the filename
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log(error);
+        toast.error(error.message);
+      }
+    }
+    setLoadingPDF(false);
   };
 
   return (
@@ -376,6 +440,23 @@ const SearchPage = () => {
               </div>
             </div>
           </div>
+          <Divider />
+          {imagesData.length !== 0 ? (
+            <div className="w-full flex justify-center items-center mb-10">
+              <Button
+                size="md"
+                isLoading={loadingPDF}
+                variant="solid"
+                className="bg-gradient-to-br from-indigo-800 via-blue-800 via-30% to-blue-600 to-80%"
+                radius="full"
+                onPress={handleDownloadPDF}
+              >
+                Download PDF
+              </Button>
+            </div>
+          ) : (
+            <></>
+          )}
         </div>
       </AnimatePresence>
     </>
