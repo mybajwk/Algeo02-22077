@@ -16,11 +16,25 @@ const DescPage = () => {
         <h1 className="font-sora text-[70px] md:text-[80px] font-bold tracking-tight w-full bg-clip-text text-center text-transparent bg-gradient-to-tr  from-[#b3c8ff] via-[#467cff] to-[#0048ff] ">
           Description
         </h1>
-        <div className="w-full font-spline text-sm md:text-base text-white rounded-lg min-h-[400px] md:px-10 px-0">
+        <div className="w-full font-spline text-justify text-sm md:text-base text-white rounded-lg min-h-[350px] max-w-[75%] lg:max-w-[900px]">
           <p>
-            djiajde ea eakifeljsmceicjiejfiajdaidjjdejdeidjejei dijdalasdei
-            jijsdalem ansdejsdeiskmd eiajsdji asdkelia sld i die a ksjdf iO
-            oejfJi ej
+            {`Search image yang kami buat menerapkan teori CBIR atau Content-Based Image Retrieval. 
+            Content-Based Image Retrieval sendiri (CBIR) merupakan sebuah proses yang
+            digunakan untuk mencari dan mengambil gambar berdasarkan konten
+            visual gambar seperti warna, tekstur, dan bentuk, tanpa bergantung
+            pada kata kunci atau teks. Hal ini membuat CBIR sangat berguna dalam
+            mengakses dan mengeksplorasi koleksi gambar ketika tidak ada
+            informasi teks atau kata kunci yang cukup untuk mendeskripsikan
+            gambar yang dicari. Fitur-fitur penting dari gambar, seperti warna,
+            tekstur, dan bentuk akan diekstraksi terlebih dahulu sebelum
+            selanjutnya akan diwakili dalam bentuk vektor atau deskripsi
+            numerik. Lalu CBIR menggunakan algoritma pencocokan untuk
+            membandingkan vektor-fitur dari gambar yang dicari dengan
+            vektor-fitur gambar dalam dataset. Hasil dari pencocokan selanjutnya
+            dapat digunakan untuk mengurutkan gambar-gambar dalam dataset dan
+            menampilkan gambar yang paling sesuai dengan gambar yang dicari.
+            Implementasi CBIR yang paling populer digunakan adalah CBIR dengan
+            parameter warna dan CBIR dengan parameter/tekstur.`}
           </p>
         </div>
         <div
@@ -40,8 +54,8 @@ const DescPage = () => {
               <ul className="list-disc text-justify">
                 <li>
                   <p className="font-spline text-sm md:text-base text-white">
-                    Masuk   kedalam halaman   search baik default    ataupun camera
-                    tergantung  dari Anda   mau menggunakan fitur    yang mana.
+                    Masuk kedalam halaman search baik default ataupun camera
+                    tergantung dari Anda mau menggunakan fitur yang mana.
                   </p>
                 </li>
                 <li>
