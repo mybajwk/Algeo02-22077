@@ -25,7 +25,7 @@ identifying images based on their visual content, such as color or texture.
 ## Technologies Used
 - Back-End:
 Gin, Docker, Golang, Chromedp, Gopdf, Serpapi, Viper, Zerolog
-- Front-End
+- Front-End:
 TypeScript, Next.js, react.js, Next UI, Tailwind CSS, shadcn UI, spline.
 
 <a name="features"></a>
