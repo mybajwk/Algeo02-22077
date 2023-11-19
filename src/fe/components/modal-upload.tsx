@@ -121,8 +121,7 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open, setTime }) => {
         }
 
         if (type === "url") {
-          const urlRegex: RegExp =
-          /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,})(\/[\w.-]*)*\/?$/;
+          const urlRegex: RegExp = /^(https?):\/\/.*/;
 
           if (!urlRegex.test(input)) {
             setErrorWS("URL web tidak valid");
@@ -154,7 +153,7 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open, setTime }) => {
             throw new Error(resBody.message);
           }
 
-          toast.success("data for scrapping submited");
+          toast.success("image scrapping succesfull");
           onOpenChange(false);
           setLoading(false);
           setErrorWS("");
@@ -186,7 +185,8 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open, setTime }) => {
             throw new Error(resBody.message);
           }
 
-          toast.success("data for scrapping submited");
+          toast.success("image scrapping succesfull");
+
           onOpenChange(false);
           setLoading(false);
           setErrorWS("");
@@ -218,7 +218,8 @@ const ModalUpload: FC<ModalUploadProps> = ({ onOpenChange, open, setTime }) => {
             throw new Error(resBody.message);
           }
 
-          toast.success("data for scrapping submited");
+          toast.success("image scrapping succesfull");
+
           onOpenChange(false);
           setLoading(false);
           setErrorWS("");
