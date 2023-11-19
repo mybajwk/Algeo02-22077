@@ -25,7 +25,7 @@ identifying images based on their visual content, such as color or texture.
 ## Technologies Used
 - Back-End:
 Gin, Docker, Golang, Chromedp, Gopdf, Serpapi, Viper, Zerolog
-- Front-End
+- Front-End:
 TypeScript, Next.js, react.js, Next UI, Tailwind CSS, shadcn UI, spline.
 
 <a name="features"></a>
@@ -63,13 +63,6 @@ docker compose build
 docker compose up
 ```
 - Setelah itu, pada web browser Anda bukalah localhost:7781.
-
-<a name="acknowledgements">
-
-## Acknowledgements
-- Thanks To Allah SWT
-- This project was inspired by [Eigenface](https://en.wikipedia.org/wiki/Eigenface)
-- Many thanks to [Dr. Ir. Rinaldi Munir, M.T.](https://informatika.stei.itb.ac.id/~rinaldi.munir/) for his guidance and support
 
 <a name="contact"></a>
 
