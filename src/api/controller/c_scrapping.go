@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"algeo02/config"
 	"algeo02/schema"
 	"algeo02/utilities"
 	"context"
@@ -113,10 +114,10 @@ func ScrapingImageText(contexts *gin.Context) {
 		"q":       input.Text,
 		"engine":  "google_images",
 		"ijn":     "0",
-		"api_key": "174f812d2729c1dc5e767a2334de9361e46d7408c50fa8aeb3befa9a33aea545",
+		"api_key": config.Config.ApiKey,
 	}
 
-	search := g.NewGoogleSearch(parameter, "174f812d2729c1dc5e767a2334de9361e46d7408c50fa8aeb3befa9a33aea545")
+	search := g.NewGoogleSearch(parameter, config.Config.ApiKey)
 	results, _ := search.GetJSON()
 	images_results := results["images_results"].([]interface{})
 
