@@ -48,7 +48,7 @@ Docker [Download](https://www.docker.com/products/docker-desktop/)
 ```bash
 git clone https://github.com/mybajwk/Algeo02-22077.git
 ```
-- Buka terminal lalu masuk ke root directory respository ini.
+- Buka terminal lalu masuk ke root directory respository ini, pastikan juga berada pada branch main.
 
 <a name="usage"></a>
 
@@ -62,7 +62,7 @@ docker compose build
 ```bash
 docker compose up
 ```
-- Setelah itu, pada web browser Anda bukalah localhost:7781.
+- Setelah itu, pada web browser Anda bukalah [http://localhost:7781/](http://localhost:7781/).
 
 <a name="contact"></a>
 
