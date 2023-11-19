@@ -13,10 +13,10 @@ const DescPage = () => {
         <Transition />
       </motion.div>
       <div className="flex flex-col min-w-screen justify-center items-center mt-3">
-        <h1 className="font-sora text-[70px] md:text-[80px] font-bold tracking-tight w-full bg-clip-text text-center text-transparent bg-gradient-to-tr  from-[#b3c8ff] via-[#467cff] to-[#0048ff] ">
+        <h1 className="font-sora text-[45px] sml:text-[60px] sm:text-[70px] md:text-[80px] font-bold tracking-tight w-full bg-clip-text text-center text-transparent bg-gradient-to-tr  from-[#b3c8ff] via-[#467cff] to-[#0048ff] ">
           Description
         </h1>
-        <div className="w-full font-spline text-justify text-sm md:text-base text-white rounded-lg min-h-[350px] max-w-[75%] lg:max-w-[900px]">
+        <div className="w-full font-spline text-justify text-sm md:text-base text-white rounded-lg min-h-fit pb-20 max-w-[80%] lg:max-w-[900px]">
           <p>
             {`Search image yang kami buat menerapkan teori CBIR atau Content-Based Image Retrieval. 
             Content-Based Image Retrieval (CBIR) merupakan sebuah proses yang
@@ -39,7 +39,7 @@ const DescPage = () => {
         </div>
         <div
           id="how"
-          className="relative min-h-[1200px] sm:min-h-[1000px] lg:min-h-[800px] w-full"
+          className="relative min-h-[1700px] sml:min-h-[1400px] sm:min-h-[1100px] lg:min-h-[900px] w-full"
         >
           <div className="absolute pb-20 top-0 bottom-0 w-screen flex flex-col justify-center items-center -left-[20px] phone:-left-[40px] sm:-left-[80px] lg:-left-[146px]  bg-gradient-to-br from-[#000B18] to-[#4C2C96] z-[10] pt-[30px]">
             <div className="w-screen text-center">

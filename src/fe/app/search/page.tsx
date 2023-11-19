@@ -203,7 +203,7 @@ const SearchPage = () => {
 
       const pdfUrl = `${process.env.NEXT_PUBLIC_API_URL}/media/${token}/file.pdf`;
       const link = document.createElement("a");
-      link.target = "_blank"
+      link.target = "_blank";
       link.href = pdfUrl;
       link.download = "result.pdf"; // specify the filename
       document.body.appendChild(link);
@@ -366,8 +366,22 @@ const SearchPage = () => {
           <div className="flex flex-col w-full justify-center items-center gap-3">
             <div className="w-full">
               <div className="flex flex-row justify-between items-center p-1">
-                <h2 className="text-lg md:text-xl">Result</h2>
-                <div className="flex flex-row gap-3 justify-end items-center">
+                <div className="flex flex-col sm:hidden gap-2">
+                  <h2 className="sm:hidden flex text-lg md:text-xl">Result</h2>
+                  <p className="text-base md:text-md">
+                    Uploaded Time {timeUpload.toFixed(2)}s
+                  </p>
+                  <p className="text-base md:text-md">
+                    Search Time {timeSearch.toFixed(2)}s
+                  </p>
+                </div>
+                <div className="flex justify-center items-center sm:hidden">
+                  <Button isIconOnly variant="light" onPress={handleRerender}>
+                    <RotateCcw className="h-4 w-4 text-white" />
+                  </Button>
+                </div>
+                <h2 className="hidden sm:flex text-lg md:text-xl">Result</h2>
+                <div className="sm:flex flex-row hidden gap-3 justify-end items-center">
                   <p className="text-base md:text-md">
                     Uploaded Time {timeUpload.toFixed(2)}s
                   </p>

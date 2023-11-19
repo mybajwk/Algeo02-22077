@@ -40,9 +40,9 @@ const AboutPage = () => {
       <motion.div key="about" className="absolute h-full">
         <Transition />
       </motion.div>
-      <div className="relative w-full flex flex-col mt-5 justify-center items-center ">
+      <div className="relative w-full flex flex-col mt-5 justify-center items-center">
         <div className="w-full text-center">
-          <h1 className="w-full font-sora text-[70px] md:text-[80px] font-bold tracking-tight">
+          <h1 className="w-full font-sora text-[45px] sml:text-[60px] sm:text-[70px] md:text-[80px] font-bold tracking-tight">
             <span className="bg-clip-text text-transparent bg-gradient-to-tr  from-[#b3c8ff] via-[#467cff] to-[#0048ff]">
               About
             </span>{" "}
@@ -59,13 +59,13 @@ const AboutPage = () => {
           </p>
         </div>
 
-        <h3 className="mt-16 font-sora text-6xl font-bold text-center">
+        <h3 className="mt-16 font-sora text-[45px] sml:text-[60px] sm:text-[70px] md:text-[80px] font-bold text-center leading-tight mb-8">
           Our{" "}
           <span className="bg-clip-text text-transparent bg-gradient-to-tr  from-[#b3c8ff] via-[#467cff] to-[#0048ff]">
             Developers
           </span>
         </h3>
-        <div className="flex flex-col med2:hidden xl:flex xl:flex-row gap-6 xl:gap-3 justify-end items-center xl:justify-center xl:items-end min-h-[1000px] xl:min-h-[400px] z-[700]">
+        <div className="flex flex-col med2:hidden xl:flex xl:flex-row gap-10 xl:gap-3 justify-end items-center xl:justify-center xl:items-end min-h-[1000px] xl:min-h-[400px] z-[700]">
           {developers.map((dev) => (
             <DevCard developer={dev} key={dev.NIM} />
           ))}
