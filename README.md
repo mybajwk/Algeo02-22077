@@ -40,6 +40,21 @@ TypeScript, Next.js, react.js, Next UI, Tailwind CSS, shadcn UI, spline.
 
 <a name="setup"></a>
 
+## Screenshots Test
+
+<p align="center">
+<img src="img/tes1.jpg">
+<img src="img/tes2.jpg">
+<img src="img/tes3.jpg">
+<img src="img/tes4.jpg">
+<img src="img/tes5.jpg">
+<img src="img/tes6.jpg">
+<img src="img/tes7.jpg">
+<img src="img/tes8.jpg">
+<img src="img/tes9.jpg">
+</p>
+
+
 ## Setup
 - Install docker terlebih dahulu jika belum ada:
 Docker [Download](https://www.docker.com/products/docker-desktop/)
