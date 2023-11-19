@@ -64,13 +64,6 @@ docker compose up
 ```
 - Setelah itu, pada web browser Anda bukalah localhost:7781.
 
-<a name="acknowledgements">
-
-## Acknowledgements
-- Thanks To Allah SWT
-- This project was inspired by [Eigenface](https://en.wikipedia.org/wiki/Eigenface)
-- Many thanks to [Dr. Ir. Rinaldi Munir, M.T.](https://informatika.stei.itb.ac.id/~rinaldi.munir/) for his guidance and support
-
 <a name="contact"></a>
 
 ## Contact
